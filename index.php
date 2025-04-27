@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="js/script.js" defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <title>BizzFlow</title>
 </head>
 

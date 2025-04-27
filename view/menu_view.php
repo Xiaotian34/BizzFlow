@@ -2,38 +2,59 @@
 if (!isset($_SESSION["correo"])) {
     echo '
         <header>
-            <h1 href="index.php>Aqui irá el logo</h1>
-            <ul>
-                <div>
-                    <a href="index.php?controlador=usuarios&action=login">Iniciar Sesion</a>
-                    <a href="index.php?controlador=usuarios&action=registro">Registrate</a>
+            <div class="navbar">
+                <div class="navbar-left">
+                    <a href="index.php" class="logo-link">
+                        <img src="img/logoBF.png" alt="Logo BizzFlow">
+                        <h2>BizzFlow</h2>
+                    </a>
                 </div>
-            </ul>
+                <!-- Botón de hamburguesa -->
+                <label class="menu-toggle">
+                    <input type="checkbox" id="menuCheckbox" onclick="toggleSlider()" />
+                    <svg viewBox="0 0 32 32">
+                        <path
+                            class="line line-top-bottom"
+                            d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
+                        ></path>
+                        <path class="line" d="M7 16 27 16"></path>
+                    </svg>
+                </label>
+            </div>
         </header>
+        <div id="menuSlider" class="slider-menu">
+            <a href="index.php?controlador=usuarios&action=login">Iniciar Sesión</a>
+            <a href="index.php?controlador=usuarios&action=registro">Regístrate</a>
+        </div>
         ';
 } else {
     echo '
         <header>
-            <h1>Aqui irá el logo
-                <a href="index.php"></a>
-            </h1>
-            <ul>
-                <div class="dropdown">
-                <button onclick="myFunction()" class="dropbtn">Dropdown</button>
-                    <div id="myDropdown" class="dropdown-content">
-                        <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
-                        <a href="index.php?controlador=contactar&action=home">Contactar</a>
-                        <a href="index.php?controlador=documentos&action=gestionarDocumentos">Gestionar documentos</a>
-                        <a href="index.php?controlador=usuarios&action=gestionarUsuarios">Gestionar usuarios</a>
-                    </div>
+            <div class="navbar">
+                <div class="navbar-left">
+                    <a href="index.php" class="logo-link">
+                        <img src="img/logoBF.png" alt="Logo BizzFlow">
+                        <h2>BizzFlow</h2>
+                    </a>
                 </div>
-                <div class="dropdown">
-                <button onclick="myFunction()" class="dropbtn">Aqui se veria el usuario</button>
-                    <div id="myDropdown" class="dropdown-content">
-                        <a href="index.php?controlador=usuarios&action=logout">Cerrar sesion</a>
-                    </div>
-                </div>
-            </ul>
+                <!-- Botón de hamburguesa -->
+                <label class="menu-toggle">
+                    <input type="checkbox" id="menuCheckbox" onclick="toggleSlider()" />
+                    <svg viewBox="0 0 32 32">
+                        <path
+                            class="line line-top-bottom"
+                            d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
+                        ></path>
+                        <path class="line" d="M7 16 27 16"></path>
+                    </svg>
+                </label>
+            </div>
         </header>
+        <div id="menuSlider" class="slider-menu">
+            <a href="index.php?controlador=contactar&action=home">Contactar</a>
+            <a href="index.php?controlador=documentos&action=gestionarDocumentos">Gestionar documentos</a>
+            <a href="index.php?controlador=usuarios&action=gestionarUsuarios">Gestionar usuarios</a>
+            <a href="index.php?controlador=usuarios&action=logout">Cerrar sesión</a>
+        </div>
         ';
 }

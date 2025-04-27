@@ -89,4 +89,27 @@ function gestionarUsuarios() {
     $usuarios = $user->get_usuarios();
     require_once("view/admin_view.php");
 }
+
+if ($_GET['action'] === 'googleSignIn') {
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    $nombre = $input['nombre'];
+    $correo = $input['correo'];
+    $google_id = $input['google_id'];
+
+    // Verifica si el usuario ya existe en la base de datos
+    $usuario = $usuarioModel->buscarPorCorreo($correo);
+
+    if ($usuario) {
+        // Inicia sesión si el usuario ya existe
+        $_SESSION['correo'] = $correo;
+        echo json_encode(['success' => true]);
+    } else {
+        // Registra al usuario si no existe
+        $usuarioModel->registrarUsuario($nombre, $correo, null, $google_id);
+        $_SESSION['correo'] = $correo;
+        echo json_encode(['success' => true]);
+    }
+    exit;
+}
 ?>
