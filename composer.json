@@ -1,0 +1,5 @@
+{
+    "require": {
+        "aspose/cells": "^25.4"
+    }
+}

@@ -1,0 +1,77 @@
+{
+    "packages": [
+        {
+            "name": "aspose/cells",
+            "version": "25.4",
+            "version_normalized": "25.4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aspose-cells/Aspose.Cells-for-PHP-via-Java.git",
+                "reference": "04a15c714cda0e04b969e81b7bb1a42d939c163c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aspose-cells/Aspose.Cells-for-PHP-via-Java/zipball/04a15c714cda0e04b969e81b7bb1a42d939c163c",
+                "reference": "04a15c714cda0e04b969e81b7bb1a42d939c163c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "time": "2025-04-14T07:27:17+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "aspose\\cells\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "Aspose",
+                    "homepage": "https://products.aspose.com/cells/php-java"
+                }
+            ],
+            "description": "A powerful library for manipulating and converting Excel (XLS, XLSX, XLSB), ODS, CSV and HTML files.",
+            "homepage": "https://products.aspose.com/cells/php-java",
+            "keywords": [
+                "Excel to PDF",
+                "MHTML",
+                "OOXML",
+                "SpreadSheetML",
+                "XLSB",
+                "XPS",
+                "convert",
+                "csv",
+                "docx",
+                "excel",
+                "html",
+                "jpg",
+                "json",
+                "markdown",
+                "numbers",
+                "ods",
+                "pdf",
+                "pptx",
+                "spreadsheet",
+                "sql",
+                "svg",
+                "xls",
+                "xlsm",
+                "xlsx",
+                "xml"
+            ],
+            "support": {
+                "issues": "https://github.com/aspose-cells/Aspose.Cells-for-PHP-via-Java/issues",
+                "source": "https://github.com/aspose-cells/Aspose.Cells-for-PHP-via-Java/tree/25.4"
+            },
+            "install-path": "../aspose/cells"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}
