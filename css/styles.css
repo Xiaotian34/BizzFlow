@@ -1,15 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Permanent+Marker&display=swap');
 
+:root {
+  --primary-color: #0A96A6; /* Color principal */
+  --secondary-color: #12A6A6; /* Color secundario */
+  --accent-color: #21BFBF; /* Color de acento */
+  --light-color: #F2F2F2; /* Color claro */
+  --dark-color: #0D0D0D; /* Color oscuro */
+}
+
 html {
   font-family: "Figtree", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
-  font-style: normal;               
+  font-style: normal;
+  min-height: 100%;       
+  position: relative;  
 }
 
 .dropbtn {
-  background-color: #04AA6D;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--light-color);
   padding: 16px;
   font-size: 16px;
   border: none;
@@ -17,7 +27,7 @@ html {
 }
 
 .dropbtn:hover, .dropbtn:focus {
-  background-color: #3e8e41;
+  background-color: var(--secondary-color);
 }
 
 #myInput {
@@ -28,10 +38,12 @@ html {
   font-size: 16px;
   padding: 14px 20px 12px 45px;
   border: none;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--light-color);
 }
 
-#myInput:focus {outline: 3px solid #ddd;}
+#myInput:focus {
+  outline: 3px solid var(--light-color);
+}
 
 .dropdown {
   position: relative;
@@ -41,21 +53,24 @@ html {
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #f6f6f6;
+  background-color: var(--light-color);
   min-width: 230px;
   overflow: auto;
-  border: 1px solid #ddd;
+  border: 1px solid var(--dark-color);
   z-index: 1;
 }
 
 .dropdown-content a {
-  color: black;
+  color: var(--dark-color);
   padding: 12px 16px;
   text-decoration: none;
   display: block;
 }
 
-.dropdown a:hover {background-color: #ddd;}
+.dropdown-content a:hover {
+  color: var(--light-color);
+  background-color: var(--primary-color);
+}
 
 .dropdown-content {
   background-color: white;
@@ -82,35 +97,72 @@ html {
 
 .show {display: block;}
 
-/* Estilo para el navbar */
+/* Navbar */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: white;
+  background-color: var(--light-color);
   padding: 10px 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid #ddd;
-  position: relative; /* Asegura que el navbar esté por encima */
-  z-index: 1000; /* Mayor índice de apilamiento */
+  border-bottom: 1px solid var(--dark-color);
+  position: relative;
+  z-index: 1000;
 }
 
-/* Contenedor para el logo y el h2 */
 .navbar-left {
   display: flex;
-  align-items: center; /* Centra verticalmente el logo y el texto */
-  gap: 10px; /* Espacio entre el logo y el h2 */
+  align-items: center;
+  gap: 10px;
 }
 
-/* Estilo para el enlace del logo */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.navbar-right .sign-up {
+  text-decoration: none;
+  color: var(--dark-color);
+  background-color: transparent;
+  border: 2px solid var(--dark-color);
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.navbar-right .sign-in {
+  text-decoration: none;
+  color: var(--dark-color);
+  background-color: transparent; 
+  border: none; 
+  font-size: 16px; 
+  font-weight: bold;
+  padding: 8px 16px; 
+  border-radius: 20px; 
+  transition: all 0.3s ease;
+}
+
+.navbar-right .sign-in:hover {
+  color: var(--primary-color);
+}
+
+.navbar-right .sign-up:hover {
+  background-color: var(--secondary-color);
+  color: var(--light-color);
+  border-color: var(--dark-color);
+}
+
 .logo-link {
   display: flex;
-  align-items: center; /* Centra verticalmente el contenido */
-  text-decoration: none; /* Elimina el subrayado del enlace */
-  color: inherit; /* Hereda el color del texto */
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
 }
 
-/* Ajusta el estilo del h2 */
 .navbar h2 {
   margin: 0;
   font-size: 1.5rem;
@@ -174,7 +226,7 @@ html {
   display: block;
 }
 
-/* Botón de hamburguesa */
+/* Menu Toggle */
 .menu-toggle {
   cursor: pointer;
 }
@@ -212,14 +264,14 @@ html {
   stroke-dashoffset: -32.42;
 }
 
-/* Slider menu */
+/* Slider Menu */
 .slider-menu {
   height: 100%;
   width: 0;
   position: fixed;
   top: 60px;
   right: 0;
-  background-color: #333;
+  background-color: var(--dark-color);
   overflow-x: hidden;
   transition: width 0.5s ease;
   padding-top: 20px;
@@ -230,11 +282,53 @@ html {
   padding: 10px 20px;
   text-decoration: none;
   font-size: 18px;
-  color: white;
+  color: var(--light-color);
   display: block;
   transition: 0.3s;
 }
 
 .slider-menu a:hover {
-  background-color: #575757;
+  background-color: var(--secondary-color);
+}
+
+/* Footer */
+.footer {
+  background-color: var(--dark-color);
+  color: var(--light-color);
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  padding: 20px 0 30px 0;
+  width: 100%;
+  height: auto;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-size: 14px;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+  color: var(--accent-color);
 }
