@@ -36,7 +36,6 @@ if (!isset($_SESSION["correo"])) {
                         <h2>BizzFlow</h2>
                     </a>
                 </div>
-                <!-- Botón de hamburguesa -->
                 <label class="menu-toggle">
                     <input type="checkbox" id="menuCheckbox" onclick="toggleSlider()" />
                     <svg viewBox="0 0 32 32">

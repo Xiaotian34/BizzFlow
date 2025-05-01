@@ -20,12 +20,11 @@ class Usuarios_Model {
 
     public function login($correo, $contra) {
         $correo = $this->db->real_escape_string($correo);
-        $contra = $this->db->real_escape_string($contra);
 
         $sql = "SELECT * FROM usuarios WHERE correo_electronico = '$correo'";
         $consulta = $this->db->query($sql);
         if ($fila = $consulta->fetch_assoc()) {
-            return $fila['contrasena_hash'] === $contra; // O usa password_verify($contra, $fila['contrasena_hash'])
+            return password_verify($contra, $fila['contrasena_hash']); // Verifica el hash
         }
         return false;
     }
@@ -39,7 +38,7 @@ class Usuarios_Model {
     public function insertar($nombre, $correo, $contra, $tipo = 'usuario') {
         $nombre = $this->db->real_escape_string($nombre);
         $correo = $this->db->real_escape_string($correo);
-        $contra = $this->db->real_escape_string($contra); // O usa password_hash()
+        $contra = password_hash($contra, PASSWORD_DEFAULT); // Aplica hash a la contraseña
         $tipo = $this->db->real_escape_string($tipo);
 
         $sql = "INSERT INTO usuarios (nombre, correo_electronico, contrasena_hash, tipo) 
