@@ -1,0 +1,18 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Definición del degradado -->
+  <defs>
+    <linearGradient id="profileGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color: #32d3a9; stop-opacity: 1;" />
+      <stop offset="100%" style="stop-color: #3b82f6; stop-opacity: 1;" />
+    </linearGradient>
+  </defs>
+
+  <!-- Cabeza -->
+  <circle cx="50" cy="30" r="15" fill="url(#profileGradient)" />
+
+  <!-- Cuerpo -->
+  <path d="M20 70 Q50 90 80 70 Q50 50 20 70 Z" fill="url(#profileGradient)" />
+</svg>

@@ -15,16 +15,6 @@ if (!isset($_SESSION["correo"])) {
                 </div>
             </div>
         </header>
-        <footer class="footer">
-            <div class="footer-content">
-                <p>&copy; <?php echo date("Y"); ?> BizzFlow. Todos los derechos reservados.</p>
-                <ul class="footer-links">
-                    <li><a href="index.php?controlador=contactar&action=home">Contacto</a></li>
-                    <li><a href="index.php?controlador=politicas&action=privacidad">Política de Privacidad</a></li>
-                    <li><a href="index.php?controlador=politicas&action=terminos">Términos y Condiciones</a></li>
-                </ul>
-            </div>
-        </footer>
         ';
 } else {
     echo '
@@ -49,20 +39,10 @@ if (!isset($_SESSION["correo"])) {
             </div>
         </header>
         <div id="menuSlider" class="slider-menu">
+        <a href="index.php?controlador=usuarios&action=perfil">Mi perfil</a>
+        <a href="index.php?controlador=documentos&action=gestionarDocumentos">Mis documentos</a>
             <a href="index.php?controlador=contactar&action=home">Contactar</a>
-            <a href="index.php?controlador=documentos&action=gestionarDocumentos">Gestionar documentos</a>
-            <a href="index.php?controlador=usuarios&action=gestionarUsuarios">Gestionar usuarios</a>
             <a href="index.php?controlador=usuarios&action=logout">Cerrar sesión</a>
         </div>
-        <footer class="footer">
-            <div class="footer-content">
-                <p>&copy; <?php echo date("Y"); ?> BizzFlow. Todos los derechos reservados.</p>
-                <ul class="footer-links">
-                    <li><a href="index.php?controlador=contactar&action=home">Contacto</a></li>
-                    <li><a href="index.php?controlador=politicas&action=privacidad">Política de Privacidad</a></li>
-                    <li><a href="index.php?controlador=politicas&action=terminos">Términos y Condiciones</a></li>
-                </ul>
-            </div>
-        </footer>
         ';
 }
