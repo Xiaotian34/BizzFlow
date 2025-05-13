@@ -20,6 +20,19 @@ if (!isset($_SESSION["correo"])) {
     echo '
         <header>
             <div class="navbar">
+                <div class="user-menu">
+                    <div class="user-info" id="userInfo">
+                    <div class="user-details">
+                        <span class="username">Juan Pérez</span>
+                        <small class="subtitle">Administrador</small>
+                    </div>
+                    <span class="arrow" id="arrow">▼</span>
+                    </div>
+                    <div class="logout-dropdown" id="logoutDropdown">
+                    <a href="index.php?controlador=usuarios&action=perfil">Mi perfil</a>
+                    <a href="index.php?controlador=usuarios&action=logout">Cerrar sesión</a>
+                    </div>
+                </div>
                 <div class="navbar-left">
                     <a href="index.php" class="logo-link">
                         <img src="img/logoBF.png" alt="Logo BizzFlow">
@@ -37,12 +50,11 @@ if (!isset($_SESSION["correo"])) {
                     </svg>
                 </label>
             </div>
+            <div id="menuSlider" class="slider-menu">
+                <a href="index.php?controlador=documentos&action=gestionarDocumentos">Mis documentos</a>
+                <a href="index.php?controlador=contactar&action=home">Contactar</a>
+            </div>
         </header>
-        <div id="menuSlider" class="slider-menu">
-        <a href="index.php?controlador=usuarios&action=perfil">Mi perfil</a>
-        <a href="index.php?controlador=documentos&action=gestionarDocumentos">Mis documentos</a>
-            <a href="index.php?controlador=contactar&action=home">Contactar</a>
-            <a href="index.php?controlador=usuarios&action=logout">Cerrar sesión</a>
-        </div>
+    
         ';
 }

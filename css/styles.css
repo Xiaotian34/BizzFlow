@@ -126,12 +126,20 @@ html {
   left: 0;
   width: 99%;
   z-index: 1000;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .navbar-left {
+  order: 2;
+  position: absolute;
+  left: 50%;
   display: flex;
   align-items: center;
   gap: 10px;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 1;
 }
 
 .navbar-right {
@@ -247,7 +255,9 @@ html {
 /* Menu Toggle */
 .menu-toggle {
   cursor: pointer;
-  margin-right: 10px;
+  order: 1;
+  z-index: 2;
+
 }
 
 .menu-toggle input {
@@ -289,7 +299,7 @@ html {
   width: 0;
   position: fixed;
   top: 60px;
-  right: 0;
+  left: 0;
   background-color: var(--dark-color);
   overflow-x: hidden;
   transition: width 0.5s ease;
@@ -452,6 +462,107 @@ html {
   opacity: 1;
 }
 
+/* USER MENU */
+    .user-menu {
+      position: relative;
+      display: inline-block;
+      text-align: right;
+      right: 20px;
+      order: 3;
+      z-index: 2;
+    }
+
+    .user-info {
+      cursor: pointer;
+      background-color: #2c3e50;
+      padding: 10px 15px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .username {
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #bdc3c7;
+    }
+
+    .arrow {
+      font-size: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .logout-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 5px;
+      background-color: #34495e;
+      padding: 10px;
+      border-radius: 4px;
+      min-width: 150px;
+      z-index: 999;
+    }
+
+    .logout-dropdown a {
+      color: white;
+      text-decoration: none;
+      display: block;
+    }
+
+    .logout-dropdown a:hover {
+      text-decoration: underline;
+    }
+
+    .logout-dropdown.show {
+      display: block;
+    } 
+    /* === RESPONSIVE PARA MÓVILES === */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .navbar-left {
+    order: 1;
+    position: static;
+    transform: none;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .menu-toggle,
+  .user-menu {
+    order: 2;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+  }
+
+  .menu-toggle {
+    justify-content: flex-start;
+  }
+
+  .user-menu {
+    justify-content: flex-end;
+  }
+} 
+/* FIN USER MENU */
+
 /* Footer */
 .footer {
   background-color: transparent;
@@ -611,3 +722,4 @@ html {
     stroke-dashoffset: 10;
   }
 }
+/* FIN FOOTER */
