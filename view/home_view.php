@@ -105,6 +105,7 @@
                 <p>Convierte tus hojas de cálculo Excel a un formato XML estructurado.</p>
                 <button class="feature-button">Seleccionar</button>
             </div>
+
             <div class="feature-card">
                 <i class="fas fa-file-word"></i>
                 <h3>Word a XML</h3>
@@ -112,15 +113,9 @@
                 <button class="feature-button">Seleccionar</button>
             </div>
             <div class="feature-card">
-                <i class="fas fa-file-csv"></i>
-                <h3>CSV a XML</h3>
-                <p>Transforma tus archivos CSV en XML para un manejo más avanzado.</p>
-                <button class="feature-button">Seleccionar</button>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-file-code"></i>
-                <h3>JSON a XML</h3>
-                <p>Convierte tus datos JSON a XML para integraciones más flexibles.</p>
+                <i class="fas fa-file-pdf"></i>
+                <h3>PDF a XML</h3>
+                <p>Convierte documentos PDF a XML para integrarlos en tus sistemas.</p>
                 <button class="feature-button">Seleccionar</button>
             </div>
 
@@ -137,12 +132,18 @@
                 <p>Transforma facturas XML en documentos Word reutilizables.</p>
                 <button class="feature-button">Seleccionar</button>
             </div>
-
+            
             <!-- Otras funcionalidades -->
             <div class="feature-card">
-                <i class="fas fa-file-pdf"></i>
-                <h3>PDF a XML</h3>
-                <p>Convierte documentos PDF a XML para integrarlos en tus sistemas.</p>
+                <i class="fas fa-file-csv"></i>
+                <h3>CSV a XML</h3>
+                <p>Transforma tus archivos CSV en XML para un manejo más avanzado.</p>
+                <button class="feature-button">Seleccionar</button>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-file-code"></i>
+                <h3>JSON a XML</h3>
+                <p>Convierte tus datos JSON a XML para integraciones más flexibles.</p>
                 <button class="feature-button">Seleccionar</button>
             </div>
             <div class="feature-card">
