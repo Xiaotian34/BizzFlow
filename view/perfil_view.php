@@ -22,7 +22,6 @@ require_once("view/menu_view.php");
         <a href="#informacionPersonal"><i class="fas fa-user"></i> Mi cuenta</a>
         <a href="#seguridad"><i class="fas fa-lock"></i> Seguridad</a>
         <hr>
-        <a href="#actividad"><i class="fas fa-clock"></i> Últimas tareas</a>
         <a href="#configuracion"><i class="fas fa-cog"></i> Configuración</a>
     </div>
 
@@ -61,13 +60,6 @@ require_once("view/menu_view.php");
 
                     <input type="submit" name="actualizar_seguridad" value="Actualizar Seguridad">
                 </form>
-            </section>
-
-            <!-- Actividad -->
-            <section id="actividad">
-                <h2>Últimas tareas</h2>
-                <p>Aquí puedes ver un resumen de tus últimas actividades.</p>
-                <!-- Agrega contenido dinámico aquí -->
             </section>
 
             <!-- Configuración -->
