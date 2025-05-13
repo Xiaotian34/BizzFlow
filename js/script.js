@@ -55,3 +55,27 @@ function toggleSlider() {
     slider.style.width = "0"; // Cierra el slider
   }
 }
+document.addEventListener('DOMContentLoaded', function () {
+  const userInfo = document.getElementById('userInfo');
+  const dropdown = document.getElementById('logoutDropdown');
+  const arrow = document.getElementById('arrow');
+
+  if (userInfo && dropdown && arrow) {
+    userInfo.addEventListener('click', function (e) {
+      dropdown.classList.toggle('show');
+      arrow.classList.toggle('up');
+      arrow.textContent = dropdown.classList.contains('show') ? '▲' : '▼';
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', function () {
+      dropdown.classList.remove('show');
+      arrow.classList.remove('up');
+      arrow.textContent = '▼';
+    });
+
+    dropdown.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+  }
+});
