@@ -94,8 +94,7 @@
     ?>
 
     <main>
-        <h1>BizzFlow</h1>
-        <h2>Elige lo que quieres hacer</h2>
+        <h1>Elige lo que quieres hacer</h1>
 
         <div class="feature-grid">
             <!-- Conversión a XML -->

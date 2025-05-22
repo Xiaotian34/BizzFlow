@@ -8,6 +8,7 @@ require_once("view/menu_view.php");
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/stylesContact.css">
         <title>Contactar</title>
     </head>
 
@@ -30,8 +31,9 @@ require_once("view/menu_view.php");
                 </div>
             </div>
         </form>
-
-    
+    <?php
+    require_once("footer_view.php");
+    ?>
     </body>
 
     </html>

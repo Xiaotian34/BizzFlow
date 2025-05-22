@@ -45,22 +45,33 @@ function handleCredentialResponse(response) {
   .catch(error => console.error('Error:', error));
 }
 
+// Mueve la función fuera del DOMContentLoaded y hazla global
 function toggleSlider() {
   const slider = document.getElementById("menuSlider");
   const checkbox = document.getElementById("menuCheckbox");
-
-  if (checkbox.checked) {
-    slider.style.width = "250px"; // Abre el slider
+  if (checkbox) {
+    if (checkbox.checked) {
+      slider.style.width = "250px";
+    } else {
+      slider.style.width = "0";
+    }
   } else {
-    slider.style.width = "0"; // Cierra el slider
+    slider.style.width = slider.style.width === '250px' ? '0' : '250px';
   }
 }
+
 document.addEventListener('DOMContentLoaded', function () {
+  const slider = document.getElementById("menuSlider");
+  const checkbox = document.getElementById("menuCheckbox");
   const userInfo = document.getElementById('userInfo');
   const dropdown = document.getElementById('logoutDropdown');
   const arrow = document.getElementById('arrow');
 
-  if (userInfo && dropdown && arrow) {
+  if (checkbox) {
+    checkbox.addEventListener('change', toggleSlider);
+  }
+
+  if (slider && userInfo && dropdown && arrow) {
     userInfo.addEventListener('click', function (e) {
       dropdown.classList.toggle('show');
       arrow.classList.toggle('up');
@@ -78,4 +89,99 @@ document.addEventListener('DOMContentLoaded', function () {
       e.stopPropagation();
     });
   }
+});
+
+let currentStep = 1;
+const totalSteps = 4;
+
+function showStep(step) {
+    for (let i = 1; i <= totalSteps; i++) {
+        const div = document.getElementById('step' + i);
+        if (div) div.style.display = (i === step) ? 'block' : 'none';
+    }
+}
+
+function nextStep(step) {
+    if (validateStep(step)) {
+        currentStep++;
+        showStep(currentStep);
+    }
+}
+
+function prevStep(step) {
+    currentStep--;
+    showStep(currentStep);
+}
+
+function validateStep(step) {
+    switch (step) {
+        case 1:
+            const nombre = document.getElementById('nombre').value.trim();
+            const apellidos = document.getElementById('apellidos').value.trim();
+            const edad = parseInt(document.getElementById('edad').value, 10);
+            if (!nombre || !apellidos || isNaN(edad) || edad < 18) {
+                alert('Completa todos los campos y asegúrate de ser mayor de edad.');
+                return false;
+            }
+            break;
+        case 2:
+            const correo = document.getElementById('correo').value.trim();
+            if (!correo || !correo.includes('@')) {
+                alert('Introduce un correo válido.');
+                return false;
+            }
+            break;
+        case 3:
+            const passwd = document.getElementById('passwd').value;
+            const confpasswd = document.getElementById('confpasswd').value;
+            if (!passwd || passwd !== confpasswd) {
+                alert('Las contraseñas no coinciden o están vacías.');
+                return false;
+            }
+            break;
+        case 4:
+            const tipo = document.querySelector('input[name="tipo"]:checked');
+            if (!tipo) {
+                alert('Selecciona un tipo de usuario.');
+                return false;
+            }
+            break;
+    }
+    return true;
+}
+
+// Mostrar el primer paso al cargar
+document.addEventListener('DOMContentLoaded', function () {
+    showStep(1);
+});
+
+document.getElementById('registForm').addEventListener('submit', function(e) {
+    const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+    if (fechaNacimiento) {
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const m = hoy.getMonth() - nacimiento.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edad--;
+        }
+        document.getElementById('edad').value = edad;
+    }
+});
+
+// Calcula la edad automáticamente al cambiar la fecha de nacimiento
+document.getElementById('fecha_nacimiento').addEventListener('change', function() {
+    const fechaNacimiento = this.value;
+    if (fechaNacimiento) {
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const m = hoy.getMonth() - nacimiento.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edad--;
+        }
+        document.getElementById('edad').value = edad;
+    } else {
+        document.getElementById('edad').value = '';
+    }
 });

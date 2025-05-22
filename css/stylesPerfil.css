@@ -8,7 +8,8 @@ body {
 }
 
 .container {
-    margin-left: 15%; /* Space for the sidebar */
+    margin-top: 100px;
+    margin-left: 15%;
     padding: 20px;
 }
 

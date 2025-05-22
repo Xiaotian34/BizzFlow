@@ -15,7 +15,7 @@ require_once("view/menu_view.php");
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="profile-info">
-            <img src="<?php echo $_SESSION['foto_perfil'] ?? 'img/imgPerfil/defaultProfile.svg'; ?>" alt="Foto de perfil">
+            <img src="<?php echo $user->obtenerImagenPerfil($_SESSION['correo']); ?>" alt="Foto de perfil">
              
             <h3><?php echo $_SESSION['nombre']; ?></h3>
         </div>

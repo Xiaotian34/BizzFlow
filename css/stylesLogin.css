@@ -2,17 +2,18 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Altura completa de la ventana */
+    height: 100vh;
     margin: 0;
-    background-color: #f0f0f0; /* Color de fondo opcional */
+    background-color: var(--light-color);
 }
 
 .login-form {
     width: 300px;
     padding: 20px;
     background-color: #f9f9f9;
-    border-radius: 8px; /* Bordes redondeados opcionales */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra opcional */
+    border: 2px solid var(--dark-color);
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .login-form {
@@ -44,8 +45,16 @@ input[type="submit"] {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: 0.5s;
 }
 
 input[type="submit"]:hover {
-    background-color: #0A96A6;
+    
+    color: var(--primary-color);
+    background: linear-gradient(to right, var(--light-color), var(--primary-color));
+}
+
+.login-form label {
+    color: #0A96A6;
+    font-weight: bold;
 }
