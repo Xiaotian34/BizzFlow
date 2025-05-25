@@ -86,6 +86,18 @@ function gestionarDocumentos()
     $array_documentos = $documento->get_documentos_por_usuario($id_usuario);
     require_once("view/gestionar_view.php");
 }
+function estadisticas()
+{
+    require_once("model/documentos_model.php");
+    $documento = new Documentos_Model();
+
+    $message = "";
+
+    // Obtener todos los documentos
+    $id_usuario = obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
+    $array_documentos = $documento->get_documentos_por_usuario($id_usuario);
+    require_once("view/estadisticas_view.php");
+}
 
 // Función auxiliar para obtener el id del usuario a partir del correo
 function obtenerIdUsuarioPorCorreo($correo)
