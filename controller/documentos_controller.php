@@ -30,24 +30,34 @@ function gestionarDocumentos()
     // Subir nuevo documento
     if (isset($_POST["insertar"])) {
         date_default_timezone_set('Europe/Madrid');
+        $fecha = date('Y-m-d');
+        console_log($_FILES["documento"]["name"]."3");
         $nombre = $_FILES['documento']['name'];
         $tipo = pathinfo($nombre, PATHINFO_EXTENSION);
+        console_log($tipo);
         $ruta = "documentos/" . $nombre;
 
         $carpetaDestino = "documentos/";
-        if (!file_exists($carpetaDestino)) {
-            mkdir($carpetaDestino, 0777, true);
-        }
 
-        if (move_uploaded_file($_FILES["documento"]["tmp_name"], $ruta)) {
-            $id_usuario = obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
-            if ($documento->insertarDocumento($id_usuario, $nombre, $tipo, $ruta)) {
-                $message = "Documento subido correctamente";
-            } else {
-                $message = "Error al registrar en la base de datos";
+        if($_FILES["documento"]["size"]==0){
+            console_log("No se ha subido ningun fichero");
+        }else{
+            if(file_exists($carpetaDestino) || @mkdir($carpetaDestino, 0777, true)){
+                // Intentar mover el archivo subido
+                $origen  =$_FILES["documento"]["tmp_name"];
+                $destino = $carpetaDestino.$_FILES["documento"]["name"];
+                if(@move_uploaded_file($origen,$destino)){
+                    // Si el archivo se ha movido correctamente, insertar en la base de datos
+                    $id_usuario = obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
+                    if ($documento->insertarDocumento($id_usuario, $nombre, $tipo, $ruta, $fecha)) {
+                        $message = "Documento subido correctamente";
+                    } else {
+                        $message = "Error al registrar en la base de datos";
+                    }
+                }else{
+                    console_log($_FILES["documento"]["name"]." -> No se ha movido");
+                }
             }
-        } else {
-            $message = "Error al mover el archivo";
         }
     }
 

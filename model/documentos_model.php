@@ -37,9 +37,9 @@ class Documentos_Model {
     }
 
     // Insertar documento
-    public function insertarDocumento($id_usuario, $nombre_archivo, $tipo, $ruta_archivo) {
-        $sql = "INSERT INTO documentos (id_usuario, nombre_archivo, tipo, ruta_archivo) 
-                VALUES ('$id_usuario', '$nombre_archivo', '$tipo', '$ruta_archivo')";
+    public function insertarDocumento($id_usuario, $nombre_archivo, $tipo, $ruta_archivo, $fecha_subida) {
+        $sql = "INSERT INTO documentos (id_usuario, nombre_archivo, tipo, ruta_archivo, fecha_subida) 
+                VALUES ('$id_usuario', '$nombre_archivo', '$tipo', '$ruta_archivo', '$fecha_subida')";
         return $this->db->query($sql);
     }
 

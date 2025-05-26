@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/stylesForm.css">
     <script src="js/script.js" defer></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <title>BizzFlow</title>
