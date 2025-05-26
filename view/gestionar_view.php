@@ -2,17 +2,8 @@
 require_once("view/menu_view.php");
 if (isset($_SESSION["correo"])) {
 ?>
-    <!DOCTYPE html>
-    <html lang="es">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Gestionar Imagenes</title>
-    </head>
-
     <body>
-        <div id="nuevo">
+        <div id="nuevo" class="formulario">
             <form action="" method="POST" enctype="multipart/form-data">
                 <div class="container">
                     <label for="titulo">Titulo:</label><br>
@@ -21,26 +12,25 @@ if (isset($_SESSION["correo"])) {
                     <label for="descripcion">Descripcion:</label><br>
                     <textarea name="descripcion" id="descripcion" rows="4" cols="50" required></textarea>
                     <br><br>
-                    <label for="imagen">Seleccione el archivo:</label>
-                    <input type="file" id="imagen" name="imagen" required>
+                    <label for="documento">Seleccione el archivo:</label>
+                    <input type="file" id="documento" name="documento" required>
                     <br><br>
                     <input type="submit" name="insertar" value="insertar">
                 </div>
             </form>
         </div>
 
-    <div id="contenido"></div>
+        <div id="contenido" class="formulario"></div>
     <?php
-    if (isset($array_imagenes) && count($array_imagenes) > 0) {
-        echo "<table class='tabla'><tr><th>Título</th><th>Autor</th><th>Fecha</th><th>Descripción</th><th></th><th></th></tr>";
+    if (isset($array_documentos) && count($array_documentos) > 0) {
+        echo "<table class='tabla'><tr><th>Título</th><th>Tipo</th><th>Fecha de subida</th><th></th><th></th></tr>";
 
-        foreach ($array_imagenes as $registro) {
+        foreach ($array_documentos as $registro) {
             if (is_array($registro)) {
                 echo "<tr>";
-                echo "<td>" . $registro['titulo'] . "</td>";
-                echo "<td>" . $registro['autor'] . "</td>";
+                echo "<td>" . $registro['nombre_archivo'] . "</td>";
+                echo "<td>" . $registro['tipo'] . "</td>";
                 echo "<td>" . $registro['fecha_subida'] . "</td>";
-                echo "<td>" . $registro['descripcion'] . "</td>";
                 echo '<td>
                         <form action="" method="post">
                             <input type="hidden" name="id" value="' . $registro["id"] . '">
@@ -49,9 +39,9 @@ if (isset($_SESSION["correo"])) {
                     </td>';
                 echo '<td>
                         <input type="hidden" name="id" value="' . $registro["id"] . '">
-                        <input type="hidden" id="titulo'.$registro["id"].'" value="'.$registro["titulo"].'">
-                        <input type="hidden" id="descripcion'.$registro["id"].'" value="'.$registro["descripcion"].'">
-                        <input type="hidden" id="imagen'.$registro["id"].'" value="'.$registro["nombre_fichero"].'">
+                        <input type="hidden" id="titulo'.$registro["id"].'" value="'.$registro["nombre_archivo"].'">
+                        <input type="hidden" id="tipo'.$registro["id"].'" value="'.$registro["tipo"].'">
+                        <input type="hidden" id="fecha_subida'.$registro["id"].'" value="'.$registro["fecha_subida"].'">
                         <input type="submit" id="modificar" value="Modificar" onclick=modificarImagen(`'.$registro["id"].'`)>
                     </td>';
                 echo "</tr>";
@@ -59,7 +49,7 @@ if (isset($_SESSION["correo"])) {
         }
         echo "</table>";
     } else {
-        echo "<p>No hay imágenes registradas.</p>";
+        echo "<p>No hay documentos registrados.</p>";
     }
 }
     ?>

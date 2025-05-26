@@ -1,0 +1,9 @@
+.formulario{
+    top: 200px;
+    position: absolute;
+}
+.tabla{
+    top: 500px;
+    position: absolute;
+    background-color: aqua;
+}
