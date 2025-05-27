@@ -1,0 +1,163 @@
+/* Reset básico */
+body {
+  background: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  max-width: 100%;
+  margin: 40px auto;
+  background: var(--light-color);
+  border-radius: 16px;
+  padding: 32px 40px;
+}
+
+h1, h2 {
+  color: var(--primary-dark);
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-size: 2.2rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 8px;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin-top: 32px;
+}
+
+form {
+  background: var(--primary-light);
+  padding: 20px 24px;
+  border-radius: 10px;
+  margin-bottom: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 24px;
+  align-items: center;
+}
+
+form.admin-regist {
+    border: 2px solid var(--dark-color);
+}
+
+form label {
+  flex-basis: fit-content;
+  color: var(--primary-dark);
+  font-weight: 500;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+  padding: 8px 12px;
+  border: 1px solid var(--primary-color);
+  border-radius: 6px;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+
+form input[type="text"]:focus,
+form input[type="email"]:focus,
+form input[type="password"]:focus {
+  border: 1.5px solid var(--accent-color);
+  outline: none;
+}
+
+form input[type="submit"] {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: auto;
+}
+
+form input[type="submit"]:hover {
+  background: var(--accent-dark);
+}
+
+#usuarios {
+  margin-top: 18px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--background-color);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(18, 166, 166, 0.07);
+}
+
+th, td {
+  padding: 12px 10px;
+  text-align: center;
+}
+
+th {
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+tr:nth-child(even) {
+  background: var(--light-color);
+}
+
+tr:hover {
+  background: var(--accent-light);
+}
+
+td img {
+  border-radius: 50%;
+  border: 2px solid var(--secondary-color);
+  background: var(--light-color);
+}
+
+td form {
+  background: none;
+  padding: 0;
+  margin: 0;
+  display: inline;
+}
+
+td input[type="submit"] {
+  background: var(--secondary-dark);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+td input[type="submit"]:hover {
+  background: var(--accent-color);
+}
+
+@media (max-width: 900px) {
+  main {
+    padding: 18px 6px;
+  }
+  table, th, td {
+    font-size: 0.95rem;
+  }
+  form {
+    flex-direction: column;
+    gap: 10px 0;
+  }
+}

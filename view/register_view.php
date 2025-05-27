@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/stylesRegist.css">
-    <script src="js/script.js" defer></script>
     <title>Registro</title>
 </head>
 
@@ -15,7 +14,12 @@
             <img src="img/logoBF.png" alt="Logo BizzFlow" style="display: block; margin: 0 auto; height: 80px;">
         </a>
         <h2>Registro de usuario</h2>
-    
+
+        <!-- Aviso sobre el uso de los datos -->
+        <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px; border-radius: 6px; margin-bottom: 18px;">
+            <strong>Aviso:</strong> Los datos que registres serán utilizados para generar la factura electrónica (XML). Por favor, asegúrate de que sean correctos y estén actualizados.
+        </div>
+
         <?php if (!empty($message)): ?>
             <p style="color: red;"><?php echo $message; ?></p>
         <?php endif; ?>
@@ -42,35 +46,54 @@
             </div>
             <!-- Paso 3 -->
             <div class="step" id="step3" style="display:none;">
-                <label for="passwd">Contraseña:</label>
-                <input type="password" name="passwd" id="passwd" required><br><br>
-                <label for="confpasswd">Confirmar contraseña:</label>
-                <input type="password" name="confpasswd" id="confpasswd" required><br><br>
+                <label for="telefono">Número de teléfono:</label>
+                <input type="tel" name="telefono" id="telefono" required placeholder="123456789" style="flex:1;">
                 <button type="button" onclick="prevStep(3)">Anterior</button>
                 <button type="button" onclick="nextStep(3)">Siguiente</button>
             </div>
             <!-- Paso 4 -->
             <div class="step" id="step4" style="display:none;">
-                <label>Tipo de usuario:</label><br>
-                <input type="radio" name="tipo" value="usuario" id="usuario" checked>
-                <label for="usuario">Usuario</label>
-                <input type="radio" name="tipo" value="empresa" id="empresa">
-                <label for="empresa">Empresa</label><br><br>
+                <label for="passwd">Contraseña:</label>
+                <input type="password" name="passwd" id="passwd" required><br><br>
+                <label for="confpasswd">Confirmar contraseña:</label>
+                <input type="password" name="confpasswd" id="confpasswd" required><br><br>
                 <button type="button" onclick="prevStep(4)">Anterior</button>
-                <input type="submit" name="regist" value="Registrarse">
+                <button type="button" onclick="nextStep(4)">Siguiente</button>
+            </div>
+            <!-- Paso 5 -->
+            <div class="step" id="step5" style="display:none;">
+                <label>Tipo de usuario:</label><br>
+                <div class="user-type-cards">
+                    <label class="user-type-card" id="card-usuario">
+                        <input type="radio" name="tipo" value="usuario" id="usuario" checked style="display:none;">
+                        <div class="card-content">
+                            <h4>Usuario</h4>
+                            <p>Cuenta personal para autónomos o particulares.</p>
+                        </div>
+                    </label>
+                    <label class="user-type-card" id="card-empresa">
+                        <input type="radio" name="tipo" value="empresa" id="empresa" style="display:none;">
+                        <div class="card-content">
+                            <h4>Empresa</h4>
+                            <p>Cuenta para empresas o negocios.</p>
+                        </div>
+                    </label>
+                </div>
+                <br>
+                <button type="button" onclick="prevStep(5)">Anterior</button>
+                <button type="button" id="btnNext5" onclick="nextStep(5)">Finalizar</button>
+            </div>
+            <!-- Paso 6 (solo para empresa) -->
+            <div class="step" id="step6" style="display:none;">
+                <label for="nombre_empresa">Nombre de la empresa:</label>
+                <input type="text" name="nombre_empresa" id="nombre_empresa" required>
+                <br><br>
+                <button type="button" onclick="prevStep(6)">Anterior</button>
+                <button type="button" onclick="nextStep(6)">Finalizar</button>
             </div>
         </form>
     
         <p>¿Ya tienes cuenta? <a href="index.php?controlador=usuarios&action=login">Iniciar Sesion</a></p>
-
-        <!-- Botón de Google Sign-In -->
-        <div id="g_id_onload"
-            data-client_id="TU_CLIENT_ID"
-            data-context="signup"
-            data-ux_mode="popup"
-            data-callback="handleCredentialResponse">
-        </div>
-        <div class="g_id_signin" data-type="standard"></div>
     </div>
 </body>
 

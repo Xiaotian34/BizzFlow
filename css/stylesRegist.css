@@ -116,3 +116,27 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+/* Puedes agregar esto en css/stylesRegist.css */
+.user-type-cards {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+.user-type-card {
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 18px 28px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    flex: 1;
+    text-align: center;
+}
+.user-type-card.selected,
+.user-type-card:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 8px #007bff33;
+}
+.user-type-card input[type="radio"] {
+    display: none;
+}

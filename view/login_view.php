@@ -30,15 +30,6 @@
         </form>
 
         <p>¿No tienes cuenta? <a href="index.php?controlador=usuarios&action=registro">Regístrate aquí</a></p>
-
-        <!-- Botón de Google Sign-In -->
-        <div id="g_id_onload"
-            data-client_id="TU_CLIENT_ID"
-            data-context="signin"
-            data-ux_mode="popup"
-            data-callback="handleCredentialResponse">
-        </div>
-        <div class="g_id_signin" data-type="standard"></div>
     </div>
 </body>
 

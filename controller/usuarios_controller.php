@@ -59,28 +59,31 @@ function registro(){
     $message = "";
 
     if (!isset($_SESSION["correo"])) {
-        if (isset($_POST["regist"])) {
+        if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nombre"])) {
             $nombre = isset($_POST["nombre"]) ? trim($_POST["nombre"]) : '';
             $apellidos = isset($_POST["apellidos"]) ? trim($_POST["apellidos"]) : '';
             $edad = isset($_POST["edad"]) ? (int)$_POST["edad"] : 0;
             $correo = isset($_POST["correo"]) ? trim($_POST["correo"]) : '';
-            $passwd = isset($_POST["passwd"]) ? $_POST["passwd"] : '';
+            $telefono = isset($_POST["telefono"]) ? trim($_POST["telefono"]) : '';
+            $contra = isset($_POST["passwd"]) ? $_POST["passwd"] : '';
             $confirm = isset($_POST["confpasswd"]) ? $_POST["confpasswd"] : '';
             $tipo = isset($_POST["tipo"]) ? $_POST["tipo"] : 'usuario';
 
-            if (empty($nombre) || empty($apellidos) || empty($edad) || empty($correo) || empty($passwd) || empty($confirm) || empty($tipo)) {
+            if (empty($nombre) || empty($apellidos) || empty($edad) || empty($correo) || empty($telefono) || empty($contra) || empty($confirm) || empty($tipo)) {
                 $message = "Todos los campos son obligatorios";
-            } else if ($passwd !== $confirm) {
+            } else if ($contra !== $confirm) {
                 $message = "Las contraseñas no coinciden";
             } else if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
                 $message = "El correo electrónico no es válido";
             } else if ($edad < 18) {
                 $message = "Debes ser mayor de edad para registrarte";
             } else {
-                if ($user->insertar($nombre, $apellidos, $edad, $correo, $passwd, $tipo)) {
+                if ($user->insertar($nombre, $apellidos, $edad, $correo, $telefono, $contra, $tipo)) {
                     $_SESSION["correo"] = $correo;
                     $_SESSION["nombre"] = $nombre;
                     $_SESSION["tipo"] = $tipo;
+
+                    $message = "";
                     header("Location: index.php");
                     exit;
                 } else {
@@ -103,6 +106,11 @@ function logout() {
 }
 
 function gestionarUsuarios() {
+    if (!isset($_SESSION["tipo"]) || $_SESSION["tipo"] !== "admin") {
+        header("Location: index.php");
+        exit;
+    }
+
     require_once("model/usuarios_model.php");
     $user = new Usuarios_Model();
     $message = "";
@@ -121,13 +129,18 @@ function gestionarUsuarios() {
         $apellidos = isset($_POST["apellidos"]) ? $_POST["apellidos"] : '';
         $edad = isset($_POST["edad"]) ? (int)$_POST["edad"] : 0;
         $correo = isset($_POST["correo"]) ? $_POST["correo"] : '';
+        $telefono = isset($_POST["telefono"]) ? $_POST["telefono"] : '';
         $passwd = isset($_POST["passwd"]) ? $_POST["passwd"] : '';
         $tipo = isset($_POST["tipo"]) ? $_POST["tipo"] : 'usuario';
 
-        if ($user->insertar($nombre, $apellidos, $edad, $correo, $passwd, $tipo)) {
-            $message = "Insertado correctamente";
+        if ($user->insertar($nombre, $apellidos, $edad, $correo, $telefono, $passwd, $tipo)) {
+            $_SESSION["correo"] = $correo;
+            $_SESSION["nombre"] = $nombre;
+            $_SESSION["tipo"] = $tipo;
+            header("Location: index.php");
+            exit;
         } else {
-            $message = "Error al insertar";
+            $message = "Error al registrar el usuario. El correo puede que ya esté en uso.";
         }
     }
 
@@ -148,10 +161,11 @@ function perfil() {
         $apellidos = isset($_POST["apellidos"]) ? $_POST["apellidos"] : '';
         $edad = isset($_POST["edad"]) ? (int)$_POST["edad"] : 0;
         $correo = isset($_POST["correo"]) ? $_POST["correo"] : '';
+        $telefono = isset($_POST["telefono"]) ? $_POST["telefono"] : ''; // <-- Añadido
         $passwd = isset($_POST["passwd"]) ? $_POST["passwd"] : '';
 
         // Update user information
-        if ($user->actualizarUsuario($_SESSION["correo"], $nombre, $apellidos, $edad, $correo, $passwd)) {
+        if ($user->actualizarUsuario($_SESSION["correo"], $nombre, $apellidos, $edad, $correo, $telefono, $passwd)) {
             $_SESSION["nombre"] = $nombre;
             $_SESSION["correo"] = $correo;
             $message = "Datos actualizados correctamente.";
@@ -230,4 +244,26 @@ function perfil() {
 if (isset($_GET['action']) && $_GET['action'] === 'googleSignIn') {
     googleSignIn();
 }
+if (isset($_POST["guardar_edicion"])) {
+    require_once("model/usuarios_model.php"); // Asegúrate de requerir el modelo
+    $user = new Usuarios_Model(); // Instancia el modelo
+
+    $correo_original = $_POST["correo_original"];
+    $nombre = $_POST["nombre"];
+    $apellidos = $_POST["apellidos"];
+    $edad = (int)$_POST["edad"];
+    $correo = $_POST["correo"];
+    $telefono = $_POST["telefono"];
+    $passwd = $_POST["passwd"];
+    $tipo = $_POST["tipo"];
+
+    if ($user->actualizarUsuario($correo_original, $nombre, $apellidos, $edad, $correo, $telefono, $passwd)) {
+        $_SESSION["nombre"] = $nombre;
+        $_SESSION["correo"] = $correo;
+        $message = "Datos del usuario actualizados correctamente.";
+    } else {
+        $message = "Error al actualizar el usuario.";
+    }
+}
+
 ?>

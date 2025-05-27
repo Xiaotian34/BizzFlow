@@ -1,3 +1,7 @@
+// Elimina la declaración duplicada y mantén solo una al inicio del archivo
+let currentStep = 1;
+const totalSteps = 6;
+
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function myFunction() {
@@ -17,32 +21,6 @@ function filterFunction() {
       a[i].style.display = "none";
     }
   }
-}
-
-function handleCredentialResponse(response) {
-  // Decodifica el token JWT recibido
-  const data = jwt_decode(response.credential);
-
-  // Envía los datos al servidor para iniciar sesión o registrarse
-  fetch('index.php?controlador=usuarios&action=googleSignIn', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-          nombre: data.name,
-          correo: data.email,
-          google_id: data.sub
-      })
-  })
-  .then(response => response.json())
-  .then(data => {
-      if (data.success) {
-          // Redirige al usuario a la página principal
-          window.location.href = 'index.php';
-      } else {
-          alert('Error al iniciar sesión con Google.');
-      }
-  })
-  .catch(error => console.error('Error:', error));
 }
 
 // Mueve la función fuera del DOMContentLoaded y hazla global
@@ -91,26 +69,44 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-let currentStep = 1;
-const totalSteps = 4;
-
+// Funciones de navegación entre pasos
 function showStep(step) {
     for (let i = 1; i <= totalSteps; i++) {
         const div = document.getElementById('step' + i);
         if (div) div.style.display = (i === step) ? 'block' : 'none';
     }
+    currentStep = step;
 }
 
 function nextStep(step) {
-    if (validateStep(step)) {
-        currentStep++;
-        showStep(currentStep);
+    if (!validateStep(step)) return;
+
+    // Oculta el paso actual
+    document.getElementById('step' + step).style.display = 'none';
+
+    // Lógica para mostrar el siguiente paso
+    if (step === 4) {
+        // Siempre muestra el paso 5 después de la contraseña
+        document.getElementById('step5').style.display = 'block';
+    } else if (step === 5) {
+        // Si elige "Empresa", muestra el paso 6, si no, envía el formulario
+        const tipo = document.querySelector('input[name="tipo"]:checked');
+        if (tipo && tipo.value === 'empresa') {
+            document.getElementById('step6').style.display = 'block';
+        } else {
+            document.getElementById('registForm').submit();
+        }
+    } else if (step === 6) {
+        document.getElementById('registForm').submit();
+    } else {
+        // Para los demás pasos
+        document.getElementById('step' + (step + 1)).style.display = 'block';
     }
 }
 
 function prevStep(step) {
-    currentStep--;
-    showStep(currentStep);
+    document.getElementById('step' + step).style.display = 'none';
+    document.getElementById('step' + (step - 1)).style.display = 'block';
 }
 
 function validateStep(step) {
@@ -132,6 +128,15 @@ function validateStep(step) {
             }
             break;
         case 3:
+            const telefono = document.getElementById('telefono').value.trim();
+            // Validación: solo dígitos, longitud mínima 6 (ajusta según país)
+            const telefonoRegex = /^[0-9]{6,15}$/;
+            if (!telefonoRegex.test(telefono)) {
+                alert('Escribe un número de teléfono válido.');
+                return false;
+            }
+            break;
+        case 4:
             const passwd = document.getElementById('passwd').value;
             const confpasswd = document.getElementById('confpasswd').value;
             if (!passwd || passwd !== confpasswd) {
@@ -139,7 +144,7 @@ function validateStep(step) {
                 return false;
             }
             break;
-        case 4:
+        case 5:
             const tipo = document.querySelector('input[name="tipo"]:checked');
             if (!tipo) {
                 alert('Selecciona un tipo de usuario.');
@@ -153,35 +158,55 @@ function validateStep(step) {
 // Mostrar el primer paso al cargar
 document.addEventListener('DOMContentLoaded', function () {
     showStep(1);
+
+    // Evento para cambiar a paso 6 si se selecciona "Empresa"
+    document.querySelectorAll('input[name="tipo"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            if (this.value === 'empresa') {
+                const btnNext5 = document.getElementById('btnNext5');
+                if (btnNext5) btnNext5.textContent = 'Siguiente';
+            } else {
+                const btnNext5 = document.getElementById('btnNext5');
+                if (btnNext5) btnNext5.textContent = 'Finalizar';
+            }
+        });
+    });
 });
 
-document.getElementById('registForm').addEventListener('submit', function(e) {
-    const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
-    if (fechaNacimiento) {
-        const hoy = new Date();
-        const nacimiento = new Date(fechaNacimiento);
-        let edad = hoy.getFullYear() - nacimiento.getFullYear();
-        const m = hoy.getMonth() - nacimiento.getMonth();
-        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
-            edad--;
-        }
-        document.getElementById('edad').value = edad;
-    }
+// Selección visual de cards en el paso 5
+document.addEventListener('DOMContentLoaded', function () {
+    const cards = document.querySelectorAll('.user-type-card');
+    cards.forEach(card => {
+        card.addEventListener('click', function () {
+            cards.forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            this.querySelector('input[type="radio"]').checked = true;
+
+            // Cambia el texto del botón según selección
+            const btnNext5 = document.getElementById('btnNext5');
+            if (this.querySelector('input[type="radio"]').value === 'empresa') {
+                btnNext5.textContent = 'Siguiente';
+            } else {
+                btnNext5.textContent = 'Finalizar';
+            }
+        });
+    });
 });
 
 // Calcula la edad automáticamente al cambiar la fecha de nacimiento
-document.getElementById('fecha_nacimiento').addEventListener('change', function() {
-    const fechaNacimiento = this.value;
-    if (fechaNacimiento) {
-        const hoy = new Date();
-        const nacimiento = new Date(fechaNacimiento);
-        let edad = hoy.getFullYear() - nacimiento.getFullYear();
-        const m = hoy.getMonth() - nacimiento.getMonth();
-        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
-            edad--;
-        }
-        document.getElementById('edad').value = edad;
-    } else {
-        document.getElementById('edad').value = '';
+document.addEventListener('DOMContentLoaded', function() {
+    const fechaNacimiento = document.getElementById('fecha_nacimiento');
+    const edadInput = document.getElementById('edad');
+    if (fechaNacimiento && edadInput) {
+        fechaNacimiento.addEventListener('change', function() {
+            const hoy = new Date();
+            const nacimiento = new Date(this.value);
+            let edad = hoy.getFullYear() - nacimiento.getFullYear();
+            const m = hoy.getMonth() - nacimiento.getMonth();
+            if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+                edad--;
+            }
+            edadInput.value = edad;
+        });
     }
 });

@@ -33,29 +33,31 @@ class Usuarios_Model {
         return $this->db->query("DELETE FROM usuarios WHERE correo_electronico = '$correo'");
     }
 
-    public function insertar($nombre, $apellidos, $edad, $correo, $contra, $tipo) {
+    public function insertar($nombre, $apellidos, $edad, $correo, $telefono, $contra, $tipo) {
         $nombre     = $this->limpiar($nombre);
         $apellidos  = $this->limpiar($apellidos);
         $edad       = (int)$edad;
         $correo     = $this->limpiar($correo);
+        $telefono   = $this->limpiar($telefono);
         $contra     = password_hash($contra, PASSWORD_DEFAULT);
         $tipo       = $this->limpiar($tipo);
 
         if ($this->obtenerIdUsuarioPorCorreo($correo)) return false;
 
         $sql = "INSERT INTO usuarios 
-                (nombre, apellidos, edad, correo_electronico, contrasena_hash, tipo, fecha_registro, imagen_perfil)
+                (nombre, apellidos, edad, correo_electronico, telefono, contrasena_hash, tipo, fecha_registro, imagen_perfil)
                 VALUES 
-                ('$nombre', '$apellidos', $edad, '$correo', '$contra', '$tipo', NOW(), 'img/imgPerfil/defaultProfile.svg')";
+                ('$nombre', '$apellidos', $edad, '$correo', '$telefono', '$contra', '$tipo', NOW(), 'img/imgPerfil/defaultProfile.svg')";
         return $this->db->query($sql);
     }
 
-    public function actualizarUsuario($correo_actual, $nombre, $apellidos, $edad, $correo_nuevo, $passwd = null) {
+    public function actualizarUsuario($correo_actual, $nombre, $apellidos, $edad, $correo_nuevo, $telefono, $passwd = null) {
         $correo_actual  = $this->limpiar($correo_actual);
         $nombre         = $this->limpiar($nombre);
         $apellidos      = $this->limpiar($apellidos);
         $edad           = (int)$edad;
         $correo_nuevo   = $this->limpiar($correo_nuevo);
+        $telefono       = $this->limpiar($telefono);
 
         $updatePass = '';
         if ($passwd) {
@@ -64,7 +66,7 @@ class Usuarios_Model {
         }
 
         $sql = "UPDATE usuarios SET 
-                nombre = '$nombre', apellidos = '$apellidos', edad = $edad, correo_electronico = '$correo_nuevo' $updatePass
+                nombre = '$nombre', apellidos = '$apellidos', edad = $edad, correo_electronico = '$correo_nuevo', telefono = '$telefono' $updatePass
                 WHERE correo_electronico = '$correo_actual'";
 
         return $this->db->query($sql);
@@ -76,17 +78,18 @@ class Usuarios_Model {
         return $this->db->query("UPDATE usuarios SET contrasena_hash = '$hash' WHERE correo_electronico = '$correo'");
     }
 
-    public function registroGoogle($nombre, $correo, $contra, $google_id = null) {
+    public function registroGoogle($nombre, $correo, $contra, $google_id = null, $telefono = '') {
         $nombre     = $this->limpiar($nombre);
         $correo     = $this->limpiar($correo);
         $contra     = $contra ? password_hash($contra, PASSWORD_DEFAULT) : null;
         $google_id  = $google_id ? $this->limpiar($google_id) : null;
+        $telefono   = $this->limpiar($telefono);
         $tipo       = 'usuario';
         $img        = 'img/imgPerfil/defaultProfile.svg';
 
         $sql = "INSERT INTO usuarios 
-                (nombre, apellidos, edad, correo_electronico, contrasena_hash, google_id, tipo, fecha_registro, imagen_perfil)
-                VALUES ('$nombre', '', 0, '$correo', " . 
+                (nombre, apellidos, edad, correo_electronico, telefono, contrasena_hash, google_id, tipo, fecha_registro, imagen_perfil)
+                VALUES ('$nombre', '', 0, '$correo', '$telefono', " . 
                 ($contra ? "'$contra'" : "NULL") . ", " . 
                 ($google_id ? "'$google_id'" : "NULL") . ", '$tipo', NOW(), '$img')";
 
@@ -116,7 +119,6 @@ class Usuarios_Model {
         return $img ?: 'img/imgPerfil/defaultProfile.svg';
     }
 
-    // === MÉTODOS PRIVADOS AUXILIARES ===
 
     private function limpiar($valor) {
         return $this->db->real_escape_string($valor);

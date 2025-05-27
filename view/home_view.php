@@ -102,7 +102,7 @@
                 <i class="fas fa-file-excel"></i>
                 <h3>Excel a XML</h3>
                 <p>Convierte tus hojas de cálculo Excel a un formato XML estructurado.</p>
-                <button class="feature-button">Seleccionar</button>
+                <button class="feature-button" onclick="window.location.href='index.php?controlador=documentos&action=excelToXmlForm'">Seleccionar</button>
             </div>
 
             <div class="feature-card">

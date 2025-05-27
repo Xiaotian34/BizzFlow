@@ -1,4 +1,6 @@
-<?php 
+<?php
+require_once(__DIR__ . '/../vendor/aspose/cells/Java.inc');
+require_once(__DIR__ . '/../vendor/aspose/cells/lib/aspose.cells.php');
 namespace aspose\cells;
 use Java;
 
@@ -5912,7 +5914,6 @@ class TextConverter extends Java {
 		Java(self::$_className)->process(...$argv);
 	}
 }
-
 
 
 ?>
