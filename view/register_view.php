@@ -15,11 +15,6 @@
         </a>
         <h2>Registro de usuario</h2>
 
-        <!-- Aviso sobre el uso de los datos -->
-        <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px; border-radius: 6px; margin-bottom: 18px;">
-            <strong>Aviso:</strong> Los datos que registres serán utilizados para generar la factura electrónica (XML). Por favor, asegúrate de que sean correctos y estén actualizados.
-        </div>
-
         <?php if (!empty($message)): ?>
             <p style="color: red;"><?php echo $message; ?></p>
         <?php endif; ?>

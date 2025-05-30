@@ -100,11 +100,16 @@
             <!-- Conversión a XML -->
             <div class="feature-card">
                 <i class="fas fa-file-excel"></i>
-                <h3>Excel a XML</h3>
-                <p>Convierte tus hojas de cálculo Excel a un formato XML estructurado.</p>
+                <h3>Generar Factura-e</h3>
+                <p>Genera una factura electrónica con tus datos.</p>
                 <button class="feature-button" onclick="window.location.href='index.php?controlador=documentos&action=excelToXmlForm'">Seleccionar</button>
             </div>
-
+            <div class="feature-card">
+                <i class="fas fa-file-excel"></i>
+                <h3>Excel a XML</h3>
+                <p>Convierte tus hojas de cálculo Excel a un formato XML estructurado.</p>
+                <button class="feature-button" disabled>Seleccionar</button>
+            </div>
             <div class="feature-card">
                 <i class="fas fa-file-word"></i>
                 <h3>Word a XML</h3>
@@ -143,12 +148,6 @@
                 <i class="fas fa-file-code"></i>
                 <h3>JSON a XML</h3>
                 <p>Convierte tus datos JSON a XML para integraciones más flexibles.</p>
-                <button class="feature-button" disabled>Seleccionar</button>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-file-google"></i>
-                <h3>Google Sheets a XML</h3>
-                <p>Exporta tus datos desde Google Sheets a XML con facilidad.</p>
                 <button class="feature-button" disabled>Seleccionar</button>
             </div>
         </div>
