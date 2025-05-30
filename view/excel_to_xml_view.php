@@ -14,8 +14,8 @@
             <div class="form-column">
                 <h3>Datos del remitente</h3>
                 <label>Fecha: <input type="date" name="fecha" ></label>
-                <label>Nombre: <input type="text" name="nombre" ></label>
-                <label>Apellido: <input type="text" name="apellido" ></label>
+                <label>Nombre y Apellido: <input type="text" name="nombre" ></label>
+                <label>NºFactura: <input type="text" name="nfactura" ></label>
                 <label>Dirección: <input type="text" name="direccion" ></label>
                 <label>Teléfono: <input type="text" name="telefono" ></label>
                 <label>Código Postal: <input type="text" name="codigo_postal" ></label>
@@ -31,10 +31,35 @@
             </div>
         </div>
         <hr>
-        <div class="file-section">
-            <label>Archivo Excel: <input type="file" name="excel_file" accept=".xls,.xlsx" ></label>
+        <div class="container">
+        
+        <div class="form-content">
+            <form id="invoiceForm">
+
+                <div class="items-section">
+                    <div class="items-header">
+                        <h3>Items de la Factura</h3>
+                        <div class="number-input-container">
+                            <label for="numItems">Número de items:</label>
+                            <input type="number" id="numItems" min="1" max="50" value="1">
+                        </div>
+                    </div>
+                    
+                    <div id="itemsContainer">
+                        <!-- Los items se generarán aquí dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="total-section">
+                    <h3>Total de la Factura</h3>
+                    <div class="total-amount" id="totalAmount">€0.00</div>
+                </div>
+
+                <button type="submit" name="convertir" >Convertir a Factura</button>
+            </form>
         </div>
-        <button type="submit">Convertir a Factura</button>
+    </div>
+        
     </form>
     <?php require_once("footer_view.php"); ?>
 </body>
