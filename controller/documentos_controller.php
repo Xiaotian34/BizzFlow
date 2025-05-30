@@ -1,7 +1,12 @@
 <?php
 session_start();
 
-use com\aspose\cells;
+// Importar PhpSpreadsheet
+require_once 'vendor/autoload.php';
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 function home()
 {
     require_once("model/documentos_model.php");
@@ -87,6 +92,7 @@ function gestionarDocumentos()
     $array_documentos = $documento->get_documentos_por_usuario($id_usuario);
     require_once("view/gestionar_view.php");
 }
+
 function estadisticas()
 {
     require_once("model/documentos_model.php");
@@ -102,251 +108,201 @@ function estadisticas()
 
 function excelToXmlForm() {
     require_once("model/documentos_model.php");
-    require_once("C:\\xampp\\tomcat\webapps\JavaBridge\java\Java.inc");
-    require_once("C:\\xampp\htdocs\proyecto\BizzFlow\\vendor\aspose\cells\lib\aspose.cells.php");
-   // require_once(__DIR__ .'/../vendor/aspose/cells/lib/aspose.cells.php');
- //   require_once(__DIR__ .'/../vendor/aspose/cells/Java.inc');
     $documento = new Documentos_Model();
+    
     echo "aqui 1";
     if (isset($_POST["convertir"])) {
-        echo "aqui 1";
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
-        echo "aqui 1";
-        // Guardar archivo temporalmente
-        $excelTmp = $_FILES['excel_file']['tmp_name'];
-        $excelName = $_FILES['excel_file']['name'];
-        $destPath = __DIR__ . '/../uploads/' . uniqid() . '_' . $excelName;
-        move_uploaded_file($excelTmp, $destPath);
+        echo "aqui 2";
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
+            echo "aqui 3";
+            try {
+                // Guardar archivo temporalmente
+                $excelTmp = $_FILES['excel_file']['tmp_name'];
+                $excelName = $_FILES['excel_file']['name'];
+                $destPath = __DIR__ . '/../uploads/' . uniqid() . '_' . $excelName;
+                move_uploaded_file($excelTmp, $destPath);
 
-        $outputFile = "C:\\xampp\htdocs\proyecto\BizzFlow\pruebas_output\output.xlsx";
-        $saveOptions = java("com.aspose.cells.SaveFormat");
-        $format = $saveOptions->XLSX;
+                $outputFile = "C:\\xampp\\htdocs\\proyecto\\BizzFlow\\pruebas_output\\output.xlsx";
 
-        $workbook = new cells\Workbook();
-        $worksheet = $workbook->getWorksheets()->get(0); // Primera hoja
-        $cells = $worksheet->getCells();
+                // Leer Excel con PhpSpreadsheet
+                $reader = IOFactory::createReader('Xlsx');
+                $spreadsheet = $reader->load($destPath);
+                $worksheet = $spreadsheet->getActiveSheet();
 
+                // Ejemplo: leer datos de la primera fila (ajusta según tu plantilla)
+                $concepto = $worksheet->getCell('A2')->getValue();
+                $importe = $worksheet->getCell('B2')->getValue();
 
-        // Leer Excel con Aspose.Cells
-        $workbook = new \aspose\cells\Workbook($destPath);
-        $worksheet = $workbook->getWorksheets()->get(0);
-        $cells = $worksheet->getCells();
+                // Recoge los datos del formulario
+                $fecha = $_POST['fecha'];
+                $nombreApellido = $_POST['nombre'];
+                $NFactura = $_POST['nfactura'];
+                $direccion = $_POST['direccion'];
+                $telefono = $_POST['telefono'];
+                $codigo_postal = $_POST['codigo_postal'];
+                $ciudad = $_POST['ciudad'];
+                $cliente_nombre = $_POST['cliente_nombre'];
+                $cliente_nif = $_POST['cliente_nif'];
+                $cliente_domicilio = $_POST['cliente_domicilio'];
+                $cliente_cp = $_POST['cliente_cp'];
+                $cliente_telefono = $_POST['cliente_telefono'];
 
-        // Ejemplo: leer datos de la primera fila (ajusta según tu plantilla)
-        $concepto = $cells->get("A2")->getStringValue();
-        $importe = $cells->get("B2")->getDoubleValue();
+                // Crear nuevo spreadsheet
+                $newSpreadsheet = new Spreadsheet();
+                $newWorksheet = $newSpreadsheet->getActiveSheet();
 
-        // Recoge los datos del formulario
-        $fecha = $_POST['fecha'];
-        $nombreApellido = $_POST['nombre'];
-        $NFactura = $_POST['nfactura'];
-        $direccion = $_POST['direccion'];
-        $telefono = $_POST['telefono'];
-        $codigo_postal = $_POST['codigo_postal'];
-        $ciudad = $_POST['ciudad'];
-        $cliente_nombre = $_POST['cliente_nombre'];
-        $cliente_nif = $_POST['cliente_nif'];
-        $cliente_domicilio = $_POST['cliente_domicilio'];
-        $cliente_cp = $_POST['cliente_cp'];
-        $cliente_telefono = $_POST['cliente_telefono'];
+                // Añadir datos al Excel
+                $newWorksheet->setCellValue('A1', 'Cliente');
+                $newWorksheet->setCellValue('B1', 'Domicilio');
+                $newWorksheet->setCellValue('C1', 'Fecha');
+                $newWorksheet->setCellValue('D1', 'NºFactura');
+                $newWorksheet->setCellValue('E1', 'Concepto');
+                $newWorksheet->setCellValue('F1', 'Precio');
+                $newWorksheet->setCellValue('G1', 'Total');
 
-        //añadir datos al Excel
-        $cells->get("A1")->putValue("Cliente");
-        $cells->get("B1")->putValue("Domicilio");
-        $cells->get("C1")->putValue("Fecha");
-        $cells->get("D1")->putValue("NºFactura");
-        $cells->get("E1")->putValue("Concepto");
-        $cells->get("F1")->putValue("Precio");
-        $cells->get("G1")->putValue("Total");
+                // Escribir valores del formulario en fila 2
+                $newWorksheet->setCellValue('A2', $cliente_nombre);
+                $newWorksheet->setCellValue('B2', $cliente_domicilio);
+                $newWorksheet->setCellValue('C2', $fecha);
+                $newWorksheet->setCellValue('D2', $NFactura);
+                $newWorksheet->setCellValue('E2', $concepto);
+                
+                if (is_numeric($importe)) {
+                    $newWorksheet->setCellValue('F2', (float)$importe);
+                } else {
+                    $newWorksheet->setCellValue('F2', 'Monto inválido');
+                }
 
-        // Escribir valores del formulario en fila 2
-        $cells->get("A2")->putValue($cliente_nombre);
-        $cells->get("B2")->putValue($cliente_domicilio);
-        $cells->get("C2")->putValue($fecha);
-        $cells->get("D2")->putValue($NFactura);
-        $cells->get("E2")->putValue($cliente);
-        if (is_numeric($monto)) {
-            $cells->get("C2")->putValue((float)$monto);
+                // Guardar archivo Excel
+                $writer = new Xlsx($newSpreadsheet);
+                $writer->save($outputFile);
+                echo "Datos guardados correctamente.";
+
+                // Crear XML semántico
+                $xml = new DOMDocument('1.0', 'UTF-8');
+                $factura = $xml->createElement('factura');
+
+                $clienteTag = $xml->createElement('cliente', htmlspecialchars($cliente_nombre));
+                $fechaTag = $xml->createElement('fecha', htmlspecialchars($fecha));
+                $precioTag = $xml->createElement('precio', $importe);
+
+                $factura->appendChild($clienteTag);
+                $factura->appendChild($fechaTag);
+                $factura->appendChild($precioTag);
+
+                $xml->appendChild($factura);
+
+                // Guardar XML
+                $xml->formatOutput = true;
+                $xmlOutputFile = "C:\\xampp\\htdocs\\proyecto\\BizzFlow\\pruebas_output\\output.xml";
+                $xml->save($xmlOutputFile);
+
+                echo "XML semántico creado correctamente.";
+                
+                // Limpiar archivo temporal
+                unlink($destPath);
+                
+            } catch (Exception $e) {
+                echo "Error al procesar el archivo: " . $e->getMessage();
+            }
         } else {
-            $cells->get("C2")->putValue("Monto inválido");
-
+            echo "Error al procesar el archivo.";
+        }
     }
-        // Guardar archivo
-        $workbook->save($outputFile, $format);
-        echo "Datos guardados correctamente.";
-
-        // Crear XML semántico
-        $xml = new DOMDocument('1.0', 'UTF-8');
-        $factura = $xml->createElement('factura');
-
-        $clienteTag = $xml->createElement('cliente', htmlspecialchars($cliente));
-        $fechaTag = $xml->createElement('fecha', htmlspecialchars($fecha));
-        $precioTag = $xml->createElement('precio', $precio);
-
-        $factura->appendChild($clienteTag);
-        $factura->appendChild($fechaTag);
-        $factura->appendChild($precioTag);
-
-        $xml->appendChild($factura);
-
-        // Guardar XML
-        $xml->formatOutput = true;
-        $xml->save($outputFile);
-
-        echo "XML semántico creado correctamente.";
-        // Genera el XML factura-e (estructura mínima, debes completarla según la normativa)
-        /*
-        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><Facturae></Facturae>');
-        $xml->addChild('Fecha', $fecha);
-        $xml->addChild('Remitente');
-        $xml->Remitente->addChild('Nombre', $nombre);
-        $xml->Remitente->addChild('Apellido', $apellido);
-        $xml->Remitente->addChild('Direccion', $direccion);
-        $xml->Remitente->addChild('Telefono', $telefono);
-        $xml->Remitente->addChild('CodigoPostal', $codigo_postal);
-        $xml->Remitente->addChild('Ciudad', $ciudad);
-        $xml->addChild('Cliente');
-        $xml->Cliente->addChild('Nombre', $cliente_nombre);
-        $xml->Cliente->addChild('NIF', $cliente_nif);
-        $xml->Cliente->addChild('Domicilio', $cliente_domicilio);
-        $xml->Cliente->addChild('CodigoPostal', $cliente_cp);
-        $xml->Cliente->addChild('Telefono', $cliente_telefono);
-        $xml->addChild('Concepto', $concepto);
-        $xml->addChild('Importe', $importe);
-
-        // Guarda el XML en un archivo temporal
-        $xmlFile = __DIR__ . '/../uploads/facturae_' . uniqid() . '.xml';
-        $xml->asXML($xmlFile);
-
-        // Descarga el XML
-        header('Content-Type: application/xml');
-        header('Content-Disposition: attachment; filename="facturae.xml"');
-        readfile($xmlFile);
-
-        // Limpieza
-        unlink($destPath);
-        unlink($xmlFile);
-        exit;
-        */
-    } else {
-        echo "Error al procesar el archivo.";
-    }
-}
-require_once("view/excel_to_xml_view.php");
+    require_once("view/excel_to_xml_view.php");
 }
 
 function convertirExcelXml() {
-    require_once("C:\\xampp\\tomcat\webapps\JavaBridge\java\Java.inc");
-    require_once("C:\\xampp\htdocs\proyecto\BizzFlow\\vendor\aspose\cells\lib\aspose.cells.php");
-    echo "Java version: ".java("java.lang.System")->getProperty("java.version");
-    echo "aqui 1";
-if (isset($_POST["convertir"])) {
-    echo "aqui 1";
-        require_once(__DIR__ . '/../vendor/aspose/cells/lib/aspose.cells.php');
-        require_once(__DIR__ . '/../vendor/aspose/cells/Java.inc');
+    
+    if (isset($_POST["convertir"])) {
+        
+        try {
+            // Usa el correo electrónico de la sesión y sanitízalo
+            $correoUsuario = $_SESSION["correo"];
+            $correoUsuario = preg_replace('/[^A-Za-z0-9_\-@.]/', '_', $correoUsuario);
 
-        $outputExcelFile = "C:\\xampp\htdocs\proyecto\BizzFlow\documentos\aqui.xlsx";
-        $outputXMLFile = "C:\\xampp\htdocs\proyecto\BizzFlow\documentos\aqui.xml";
-        $saveOptions = java("com.aspose.cells.SaveFormat");
-        $format = $saveOptions->XLSX;
+            // Carpeta con la fecha actual (segundos incluidos)
+            $fechaActual = date("Y-m-d_H-i-s");
+            $carpetaDestino = __DIR__ . "/../documentos/" . $correoUsuario . "/" . $fechaActual . "/";
 
-        $workbook = new cells\Workbook();
-        $worksheet = $workbook->getWorksheets()->get(0); // Primera hoja
-        $cells = $worksheet->getCells();
+            if (!is_dir($carpetaDestino)) {
+                mkdir($carpetaDestino, 0777, true);
+            }
 
-        // Recoge los datos del formulario
-        $fecha = $_POST['fecha'];
-        $nombreApellido = $_POST['nombre'];
-        $NFactura = $_POST['nfactura'];
-        $direccion = $_POST['direccion'];
-        $telefono = $_POST['telefono'];
-        $codigo_postal = $_POST['codigo_postal'];
-        $ciudad = $_POST['ciudad'];
-        $cliente_nombre = $_POST['cliente_nombre'];
-        $cliente_nif = $_POST['cliente_nif'];
-        $cliente_domicilio = $_POST['cliente_domicilio'];
-        $cliente_cp = $_POST['cliente_cp'];
-        $cliente_telefono = $_POST['cliente_telefono'];
+            // Nombres de archivo con la fecha y hora actual
+            $nombreBase = $fechaActual;
+            $outputExcelFile = $carpetaDestino . $nombreBase . ".xlsx";
+            $outputXMLFile = $carpetaDestino . $nombreBase . ".xml";
 
-        //añadir datos al Excel
-        $cells->get("A1")->putValue("Cliente");
-        $cells->get("B1")->putValue("Domicilio");
-        $cells->get("C1")->putValue("Fecha");
-        $cells->get("D1")->putValue("NºFactura");
-        $cells->get("E1")->putValue("Concepto");
-        $cells->get("F1")->putValue("Precio");
-        $cells->get("G1")->putValue("Total");
+            // Crear nuevo spreadsheet
+            $spreadsheet = new Spreadsheet();
+            $worksheet = $spreadsheet->getActiveSheet();
 
-        // Escribir valores del formulario en fila 2
-        $cells->get("A2")->putValue($cliente_nombre);
-        $cells->get("B2")->putValue($cliente_domicilio);
-        $cells->get("C2")->putValue($fecha);
-        $cells->get("D2")->putValue($NFactura);
-        $cells->get("E2")->putValue($telefono);
-        if (is_numeric($NFactura)) {
-            $cells->get("C2")->putValue((float)$NFactura);
-        } else {
-            $cells->get("C2")->putValue("Monto inválido");
+            // Recoge los datos del formulario
+            $fecha = $_POST['fecha'];
+            $nombreApellido = $_POST['nombre'];
+            $NFactura = $_POST['nfactura'];
+            $direccion = $_POST['direccion'];
+            $telefono = $_POST['telefono'];
+            $codigo_postal = $_POST['codigo_postal'];
+            $ciudad = $_POST['ciudad'];
+            $cliente_nombre = $_POST['cliente_nombre'];
+            $cliente_nif = $_POST['cliente_nif'];
+            $cliente_domicilio = $_POST['cliente_domicilio'];
+            $cliente_cp = $_POST['cliente_cp'];
+            $cliente_telefono = $_POST['cliente_telefono'];
 
+            // Añadir datos al Excel
+            $worksheet->setCellValue('A1', 'Cliente');
+            $worksheet->setCellValue('B1', 'Domicilio');
+            $worksheet->setCellValue('C1', 'Fecha');
+            $worksheet->setCellValue('D1', 'NºFactura');
+            $worksheet->setCellValue('E1', 'Concepto');
+            $worksheet->setCellValue('F1', 'Precio');
+            $worksheet->setCellValue('G1', 'Total');
+
+            // Escribir valores del formulario en fila 2
+            $worksheet->setCellValue('A2', $cliente_nombre);
+            $worksheet->setCellValue('B2', $cliente_domicilio);
+            $worksheet->setCellValue('C2', $fecha);
+            $worksheet->setCellValue('D2', $NFactura);
+            $worksheet->setCellValue('E2', $telefono);
+            
+            if (is_numeric($NFactura)) {
+                $worksheet->setCellValue('F2', (float)$NFactura);
+            } else {
+                $worksheet->setCellValue('F2', 'Monto inválido');
+            }
+
+            // Guardar archivo Excel
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($outputExcelFile);
+            echo "Datos guardados correctamente.";
+
+            // Crear XML semántico
+            $xml = new DOMDocument('1.0', 'UTF-8');
+            $factura = $xml->createElement('factura');
+
+            $clienteTag = $xml->createElement('cliente', htmlspecialchars($cliente_nombre));
+            $fechaTag = $xml->createElement('fecha', htmlspecialchars($fecha));
+            $precioTag = $xml->createElement('precio', $NFactura);
+
+            $factura->appendChild($clienteTag);
+            $factura->appendChild($fechaTag);
+            $factura->appendChild($precioTag);
+
+            $xml->appendChild($factura);
+
+            // Guardar XML
+            $xml->formatOutput = true;
+            $xml->save($outputXMLFile);
+
+            require_once("view/procesado_view.php");
+            
+        } catch (Exception $e) {
+            echo "Error en la conversión: " . $e->getMessage();
+        }
     }
-        // Guardar archivo
-        $workbook->save($outputExcelFile, $format);
-        echo "Datos guardados correctamente.";
-
-        // Crear XML semántico
-        $xml = new DOMDocument('1.0', 'UTF-8');
-        $factura = $xml->createElement('factura');
-
-        $clienteTag = $xml->createElement('cliente', htmlspecialchars($cliente_nombre));
-        $fechaTag = $xml->createElement('fecha', htmlspecialchars($fecha));
-        $precioTag = $xml->createElement('precio', $NFactura);
-
-        $factura->appendChild($clienteTag);
-        $factura->appendChild($fechaTag);
-        $factura->appendChild($precioTag);
-
-        $xml->appendChild($factura);
-
-        // Guardar XML
-        $xml->formatOutput = true;
-        $xml->save($outputXMLFile);
-
-        echo "XML semántico creado correctamente.";
-        // Genera el XML factura-e (estructura mínima, debes completarla según la normativa)
-        /*
-        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><Facturae></Facturae>');
-        $xml->addChild('Fecha', $fecha);
-        $xml->addChild('Remitente');
-        $xml->Remitente->addChild('Nombre', $nombre);
-        $xml->Remitente->addChild('Apellido', $apellido);
-        $xml->Remitente->addChild('Direccion', $direccion);
-        $xml->Remitente->addChild('Telefono', $telefono);
-        $xml->Remitente->addChild('CodigoPostal', $codigo_postal);
-        $xml->Remitente->addChild('Ciudad', $ciudad);
-        $xml->addChild('Cliente');
-        $xml->Cliente->addChild('Nombre', $cliente_nombre);
-        $xml->Cliente->addChild('NIF', $cliente_nif);
-        $xml->Cliente->addChild('Domicilio', $cliente_domicilio);
-        $xml->Cliente->addChild('CodigoPostal', $cliente_cp);
-        $xml->Cliente->addChild('Telefono', $cliente_telefono);
-        $xml->addChild('Concepto', $concepto);
-        $xml->addChild('Importe', $importe);
-
-        // Guarda el XML en un archivo temporal
-        $xmlFile = __DIR__ . '/../uploads/facturae_' . uniqid() . '.xml';
-        $xml->asXML($xmlFile);
-
-        // Descarga el XML
-        header('Content-Type: application/xml');
-        header('Content-Disposition: attachment; filename="facturae.xml"');
-        readfile($xmlFile);
-
-        // Limpieza
-        unlink($destPath);
-        unlink($xmlFile);
-        exit;
-        */
-}
 }
 
 // Función auxiliar para obtener el id del usuario a partir del correo

@@ -225,6 +225,21 @@ h2 {
     background-color: var(--secondary-color);
 }
 
+.feature-button:disabled,
+.feature-button[disabled] {
+    background-color: #ccc;
+    color: #888;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+    transition: none;
+}
+
+.feature-button:disabled:hover,
+.feature-button[disabled]:hover {
+    background-color: #ccc;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .features-grid {

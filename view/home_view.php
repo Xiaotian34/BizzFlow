@@ -109,13 +109,13 @@
                 <i class="fas fa-file-word"></i>
                 <h3>Word a XML</h3>
                 <p>Convierte documentos Word a XML para integrarlos en tus sistemas.</p>
-                <button class="feature-button">Seleccionar</button>
+                <button class="feature-button" disabled>Seleccionar</button>
             </div>
             <div class="feature-card">
                 <i class="fas fa-file-pdf"></i>
                 <h3>PDF a XML</h3>
                 <p>Convierte documentos PDF a XML para integrarlos en tus sistemas.</p>
-                <button class="feature-button">Seleccionar</button>
+                <button class="feature-button" disabled>Seleccionar</button>
             </div>
 
             <!-- Conversión inversa -->
@@ -123,13 +123,13 @@
                 <i class="fas fa-file-alt"></i>
                 <h3>XML a Excel</h3>
                 <p>Convierte facturas XML a hojas de cálculo Excel para editarlas fácilmente.</p>
-                <button class="feature-button">Seleccionar</button>
+                <button class="feature-button" disabled>Seleccionar</button>
             </div>
             <div class="feature-card">
                 <i class="fas fa-file-word"></i>
                 <h3>XML a Word</h3>
                 <p>Transforma facturas XML en documentos Word reutilizables.</p>
-                <button class="feature-button">Seleccionar</button>
+                <button class="feature-button" disabled>Seleccionar</button>
             </div>
             
             <!-- Otras funcionalidades -->
@@ -137,19 +137,19 @@
                 <i class="fas fa-file-csv"></i>
                 <h3>CSV a XML</h3>
                 <p>Transforma tus archivos CSV en XML para un manejo más avanzado.</p>
-                <button class="feature-button">Seleccionar</button>
+                <button class="feature-button" disabled>Seleccionar</button>
             </div>
             <div class="feature-card">
                 <i class="fas fa-file-code"></i>
                 <h3>JSON a XML</h3>
                 <p>Convierte tus datos JSON a XML para integraciones más flexibles.</p>
-                <button class="feature-button">Seleccionar</button>
+                <button class="feature-button" disabled>Seleccionar</button>
             </div>
             <div class="feature-card">
                 <i class="fas fa-file-google"></i>
                 <h3>Google Sheets a XML</h3>
                 <p>Exporta tus datos desde Google Sheets a XML con facilidad.</p>
-                <button class="feature-button">Seleccionar</button>
+                <button class="feature-button" disabled>Seleccionar</button>
             </div>
         </div>
     </main>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 01-05-2025 a las 13:57:38
+-- Tiempo de generación: 30-05-2025 a las 19:23:10
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -81,18 +81,23 @@ DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE `usuarios` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
+  `apellidos` varchar(100) DEFAULT NULL,
+  `edad` int(11) DEFAULT NULL,
   `correo_electronico` varchar(100) NOT NULL,
+  `telefono` varchar(20) DEFAULT NULL,
   `contrasena_hash` varchar(255) NOT NULL,
   `tipo` enum('admin','empresa','usuario') DEFAULT 'usuario',
-  `fecha_registro` datetime DEFAULT current_timestamp()
+  `fecha_registro` datetime DEFAULT current_timestamp(),
+  `imagen_perfil` text NOT NULL DEFAULT 'img/imgPerfil/defaultProfile.svg'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `nombre`, `correo_electronico`, `contrasena_hash`, `tipo`, `fecha_registro`) VALUES
-(3, 'Zhetian', 'zhetian123@gmail.com', '$2y$10$uN00pMOj8fs.7wuh1J41d.GKia/x2ee6OwKhUJHij/sZu79hVHsWi', 'admin', '2025-05-01 13:50:18');
+INSERT INTO `usuarios` (`id`, `nombre`, `apellidos`, `edad`, `correo_electronico`, `telefono`, `contrasena_hash`, `tipo`, `fecha_registro`, `imagen_perfil`) VALUES
+(10, 'Zhetian', 'Dong', 20, 'zhetian20@gmail.com', '688138933', '$2y$10$KUKs6F2kLti9cjBCiPukAueJ3/0ZBnAOT5j78ULmr3Jlfzbaeaf4y', 'admin', '2025-05-19 20:53:43', 'img/imgPerfil/defaultProfile.svg'),
+(16, 'Joaquin', 'Fernandez', 25, 'butano@gmail.com', '1', '$2y$10$b8qKy4u09KDO5EA8rnE1D.5x5r0/8GpmzSL3kyamdqtpDCngtRoPu', 'empresa', '2025-05-23 20:32:02', 'img/imgPerfil/defaultProfile.svg');
 
 --
 -- Índices para tablas volcadas
@@ -134,7 +139,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `documentos`
 --
 ALTER TABLE `documentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `estadisticas`
@@ -152,7 +157,7 @@ ALTER TABLE `facturas`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Restricciones para tablas volcadas

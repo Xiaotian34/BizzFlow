@@ -1,5 +1,5 @@
 {
     "require": {
-        "aspose/cells": "^25.4"
+        "phpoffice/phpspreadsheet": "^4.3"
     }
 }
