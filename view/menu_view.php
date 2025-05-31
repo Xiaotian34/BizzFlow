@@ -42,7 +42,7 @@ if (!isset($_SESSION["correo"])) {
                     <a href="index.php?controlador=usuarios&action=logout">Cerrar sesión</a>
                     <hr style="border: 0; border-top: 1px solid #444; margin: 10px 0;">
                     <a href="index.php?controlador=documentos&action=gestionarDocumentos">Mis documentos</a>
-                    <a href="index.php?controlador=documentos&action=excelToXmlForm">formulario</a>
+                    <a href="index.php?controlador=documentos&action=excelToXmlForm">Formulario</a>
                     <a href="index.php?controlador=documentos&action=estadisticas">Estadisticas</a>
                 </div>
             </header>

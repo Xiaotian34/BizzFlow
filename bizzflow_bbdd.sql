@@ -18,10 +18,10 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `bizzflow_bbdd`
+-- Base de datos: `ddb254192`
 --
-CREATE DATABASE IF NOT EXISTS `bizzflow_bbdd` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `bizzflow_bbdd`;
+CREATE DATABASE IF NOT EXISTS `ddb254192` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `ddb254192`;
 
 -- --------------------------------------------------------
 

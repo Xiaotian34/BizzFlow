@@ -181,6 +181,49 @@ h2 {
   border: 1.5px solid var(--secondary-light);
 }
 
+/* --- Estilos para el IVA y total con IVA --- */
+.iva-section {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  background: var(--background-color, #f8fafd);
+  border-radius: 8px;
+  padding: 10px 16px;
+  border: 1.2px solid var(--secondary-light, #cce6e6);
+  box-shadow: 0 1px 4px 0 rgba(33,191,191,0.07);
+  font-size: 1.05rem;
+}
+
+.iva-section label {
+  margin: 0;
+  font-weight: 500;
+  color: var(--primary-dark, #0e7b7b);
+}
+
+.iva-section input[type="number"] {
+  width: 60px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1.5px solid var(--secondary-color, #b2dfdf);
+  background: var(--light-color, #fff);
+  color: var(--dark-color, #222);
+  font-size: 1rem;
+  margin-right: 8px;
+}
+
+.iva-total-label {
+  margin-left: 18px;
+  color: var(--primary-dark, #0e7b7b);
+}
+
+.iva-total-amount {
+  font-weight: bold;
+  color: var(--accent-color, #22b8cf);
+  font-size: 1.15rem;
+  margin-left: 4px;
+}
+
 /* Ajuste responsive */
 @media (max-width: 900px) {
   .form-container {
@@ -239,7 +282,9 @@ label {
 
 input[type="text"],
 input[type="date"],
-input[type="file"] {
+input[type="file"],
+input[type="email"],
+select {
   padding: 8px 12px;
   border: 1.5px solid var(--secondary-color);
   border-radius: 8px;
@@ -248,13 +293,29 @@ input[type="file"] {
   color: var(--dark-color);
   margin-top: 4px;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 input[type="text"]:focus,
 input[type="date"]:focus,
-input[type="file"]:focus {
+input[type="file"]:focus,
+input[type="email"]:focus,
+select:focus {
   border-color: var(--primary-color);
   outline: none;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: var(--light-color);
+  cursor: pointer;
+}
+
+select:disabled {
+  background: #e9ecef;
+  color: #adb5bd;
 }
 
 hr {
