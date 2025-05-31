@@ -122,65 +122,11 @@
             <button type="submit" name="convertir">Generar Facturae</button>
         </div>
     </div>
-</form>
-<?php require_once("footer_view.php"); ?>
-<?php require_once("loading_view.php"); ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
-    const loading = document.querySelector('.loading-overlay');
-    if (form && loading) {
-        loading.style.display = 'none';
-        form.addEventListener('submit', function() {
-            loading.style.display = 'flex';
-        });
-    }
-    // Items dinámicos
-    const itemsContainer = document.getElementById('itemsContainer');
-    const itemRowTemplate = document.getElementById('itemRowTemplate').innerHTML;
-    const totalAmount = document.getElementById('totalAmount');
-    const addItemBtn = document.getElementById('addItemBtn');
-    const ivaPorcentaje = document.getElementById('ivaPorcentaje');
-    const totalConIva = document.getElementById('totalConIva');
-    function updateTotal() {
-        let total = 0;
-        itemsContainer.querySelectorAll('.item-row').forEach(row => {
-            const cantidad = parseFloat(row.querySelector('input[name="item_cantidad[]"]').value) || 0;
-            const precio = parseFloat(row.querySelector('input[name="item_precio[]"]').value) || 0;
-            const subtotal = cantidad * precio;
-            row.querySelector('input[name="item_total[]"]').value = subtotal.toFixed(2);
-            total += subtotal;
-        });
-        totalAmount.textContent = "€" + total.toFixed(2);
-        // Calcular IVA y total con IVA
-        const iva = parseFloat(ivaPorcentaje.value) || 0;
-        const totalIva = total + (total * iva / 100);
-        totalConIva.textContent = "€" + totalIva.toFixed(2);
-    }
-    function addItemRow() {
-        const temp = document.createElement('div');
-        temp.innerHTML = itemRowTemplate;
-        const row = temp.firstElementChild;
-        // Añadir required solo a los inputs visibles
-        row.querySelector('input[name="item_descripcion[]"]').required = true;
-        row.querySelector('input[name="item_cantidad[]"]').required = true;
-        row.querySelector('input[name="item_precio[]"]').required = true;
-        row.querySelector('input[name="item_total[]"]').required = true;
-        row.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', updateTotal);
-        });
-        row.querySelector('.remove-item-btn').addEventListener('click', function() {
-            if (itemsContainer.querySelectorAll('.item-row').length > 1) {
-                row.remove();
-                updateTotal();
-            }
-        });
-        itemsContainer.appendChild(row);
-        updateTotal();
-    }
-    addItemBtn.addEventListener('click', addItemRow);
-    addItemRow();
-});
-</script>
+
+        
+    </form>
+    <?php require_once("footer_view.php"); ?>
+    <?php require_once("loading_view.php"); ?>
+
 </body>
 </html>

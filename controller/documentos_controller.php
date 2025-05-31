@@ -342,13 +342,19 @@ function convertirExcelXml() {
             $correoUsuario = $_SESSION["correo"];
             $correoUsuario = preg_replace('/[^A-Za-z0-9_\-@.]/', '_', $correoUsuario);
             $fechaActual = date("Y-m-d_H-i-s");
-            $carpetaDestino = __DIR__ . "/../documentos/" . $correoUsuario . "/" . $fechaActual . "/";
-            if (!is_dir($carpetaDestino)) {
-                mkdir($carpetaDestino, 0777, true);
+
+            $carpetaDestinoxlsx = __DIR__ . "/../documentos/" . $correoUsuario . "/excel/ ";
+            $carpetaDestinoxml = __DIR__ . "/../documentos/" . $correoUsuario . "/xml/ ";
+
+            if (!is_dir($carpetaDestinoxlsx)) {
+                mkdir($carpetaDestinoxlsx, 0777, true);
+            }
+            if (!is_dir($carpetaDestinoxml)) {
+                mkdir($carpetaDestinoxml, 0777, true);
             }
             $nombreBase = $fechaActual;
-            $outputExcelFile = $carpetaDestino . $nombreBase . ".xlsx";
-            $outputXMLFile = $carpetaDestino . $nombreBase . ".xml";
+            $outputExcelFile = $carpetaDestinoxlsx . $nombreBase . ".xlsx";
+            $outputXMLFile = $carpetaDestinoxml . $nombreBase . ".xml";
 
             // Recoge los datos del formulario
             $fecha = $_POST['fecha'] ?? '';

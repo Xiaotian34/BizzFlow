@@ -1,134 +1,56 @@
-class InvoiceForm {
-            constructor() {
-                this.itemsContainer = document.getElementById('itemsContainer');
-                this.numItemsInput = document.getElementById('numItems');
-                this.totalAmountElement = document.getElementById('totalAmount');
-                
-                this.initEventListeners();
-                this.generateItems(1); // Empezar con 1 item por defecto
-            }
-
-            initEventListeners() {
-                this.numItemsInput.addEventListener('input', (e) => {
-                    const numItems = parseInt(e.target.value) || 1;
-                    this.generateItems(numItems);
-                });
-            }
-
-            generateItems(numItems) {
-                // Limpiar container
-                this.itemsContainer.innerHTML = '';
-
-                // Generar nuevos items
-                for (let i = 1; i <= numItems; i++) {
-                    this.createItemRow(i);
-                    console.log(`Item ${i} creado`);
-                }
-
-                this.calculateTotal();
-            }
-
-            createItemRow(itemNumber) {
-                const itemRow = document.createElement('div');
-                itemRow.className = 'item-row';
-                itemRow.innerHTML = `
-                    <div>
-                        <div class="item-number">Item ${itemNumber}</div>
-                        <label for="concept${itemNumber}">Concepto:</label>
-                        <input type="text" id="concept${itemNumber}" name="concept${itemNumber}" 
-                               placeholder="Descripción del producto o servicio" required>
-                    </div>
-                    <div>
-                        <label for="price${itemNumber}">Precio (€):</label>
-                        <input type="number" id="price${itemNumber}" name="price${itemNumber}" 
-                               step="0.01" min="0" placeholder="0.00" required>
-                    </div>
-                    <div>
-                        ${numItems > 1 ? `<button type="button" class="delete-btn" onclick="invoiceForm.deleteItem(this)">×</button>` : ''}
-                    </div>
-                `;
-
-                // Agregar event listener para el cálculo del total
-                const priceInput = itemRow.querySelector(`#price${itemNumber}`);
-                priceInput.addEventListener('input', () => this.calculateTotal());
-
-                this.itemsContainer.appendChild(itemRow);
-            }
-
-            deleteItem(deleteBtn) {
-                const itemRow = deleteBtn.closest('.item-row');
-                itemRow.remove();
-                
-                // Actualizar numeración
-                this.renumberItems();
-                
-                // Actualizar el input de número de items
-                const remainingItems = this.itemsContainer.children.length;
-                this.numItemsInput.value = remainingItems;
-                
-                this.calculateTotal();
-            }
-
-            renumberItems() {
-                let itemRows = this.itemsContainer.children;
-                Array.from(itemRows).forEach((row, index) => {
-                    let itemNumber = index + 1;
-                    let numberDiv = row.querySelector('.item-number');
-                    let conceptInput = row.querySelector('input[id^="concept"]');
-                    let priceInput = row.querySelector('input[id^="price"]');
-                    
-                    numberDiv.textContent = `Item ${itemNumber}`;
-                    conceptInput.id = `concept${itemNumber}`;
-                    conceptInput.name = `concept${itemNumber}`;
-                    priceInput.id = `price${itemNumber}`;
-                    priceInput.name = `price${itemNumber}`;
-                });
-            }
-
-            calculateTotal() {
-                let total = 0;
-                let priceInputs = this.itemsContainer.querySelectorAll('input[id^="price"]');
-                
-                priceInputs.forEach(input => {
-                    let price = parseFloat(input.value) || 0;
-                    total += price;
-                });
-
-                this.totalAmountElement.textContent = `€${total.toFixed(2)}`;
-            }
-
-            handleSubmit() {
-                let formData = new FormData(document.getElementById('invoiceForm'));
-                let invoiceData = {
-                    client: {
-                        name: formData.get('clientName'),
-                        email: formData.get('clientEmail')
-                    },
-                    items: [],
-                    notes: formData.get('notes'),
-                    total: 0
-                };
-
-                // Recopilar items
-                let itemRows = this.itemsContainer.children;
-                Array.from(itemRows).forEach((row, index) => {
-                    let itemNumber = index + 1;
-                    let concept = formData.get(`concept${itemNumber}`);
-                    let price = parseFloat(formData.get(`price${itemNumber}`)) || 0;
-                    
-                    invoiceData.items.push({
-                        concept: concept,
-                        price: price
-                    });
-                    
-                    invoiceData.total += price;
-                });
-
-                // Mostrar datos de la factura
-                console.log('Datos de la factura:', invoiceData);
-                alert(`Factura creada exitosamente!\n\nCliente: ${invoiceData.client.name}\nTotal: €${invoiceData.total.toFixed(2)}\nItems: ${invoiceData.items.length}`);
-            }
+document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form'); // Ajusta el selector si tu formulario tiene un id/clase
+        const loading = document.querySelector('.loading-overlay');
+        if (form && loading) {
+            loading.style.display = 'none';
+            form.addEventListener('submit', function() {
+                loading.style.display = 'flex';
+            });
         }
 
-        // Inicializar la aplicación
-        const invoiceForm = new InvoiceForm();
+        // Items dinámicos
+    const itemsContainer = document.getElementById('itemsContainer');
+    const itemRowTemplate = document.getElementById('itemRowTemplate').innerHTML;
+    const totalAmount = document.getElementById('totalAmount');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const ivaPorcentaje = document.getElementById('ivaPorcentaje');
+    const totalConIva = document.getElementById('totalConIva');
+
+    function updateTotal() {
+        let total = 0;
+        itemsContainer.querySelectorAll('.item-row').forEach(row => {
+            const cantidad = parseFloat(row.querySelector('input[name="item_cantidad[]"]').value) || 0;
+            const precio = parseFloat(row.querySelector('input[name="item_precio[]"]').value) || 0;
+            const subtotal = cantidad * precio;
+            row.querySelector('input[name="item_total[]"]').value = subtotal.toFixed(2);
+            total += subtotal;
+        });
+        totalAmount.textContent = "€" + total.toFixed(2);
+
+        // Calcular IVA y total con IVA
+        const iva = parseFloat(ivaPorcentaje.value) || 0;
+        const totalIva = total + (total * iva / 100);
+        totalConIva.textContent = "€" + totalIva.toFixed(2);
+    }
+
+    function addItemRow() {
+        const temp = document.createElement('div');
+        temp.innerHTML = itemRowTemplate;
+        const row = temp.firstElementChild;
+        row.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', updateTotal);
+        });
+        row.querySelector('.remove-item-btn').addEventListener('click', function() {
+            row.remove();
+            updateTotal();
+        });
+        itemsContainer.appendChild(row);
+        updateTotal();
+    }
+
+    // Añadir item con el botón +
+    addItemBtn.addEventListener('click', addItemRow);
+
+    // Inicializa con un item por defecto
+    addItemRow();
+    });
