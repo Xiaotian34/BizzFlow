@@ -26,7 +26,8 @@ h2 {
 .regist-form input[type="text"],
 .regist-form input[type="email"],
 .regist-form input[type="password"],
-.regist-form input[type="date"] {
+.regist-form input[type="date"],
+.regist-form input[type="tel"] {
     width: 95%;
     padding: 10px;
     margin: 5px 0 15px 0;
@@ -36,8 +37,7 @@ h2 {
     color: #333;
 }
 
-.regist-form button,
-.regist-form input[type="submit"] {
+.regist-form button {
     width: 100%;
     padding: 10px;
     background-color: #0A96A6;
@@ -49,10 +49,26 @@ h2 {
     transition: 0.5s;
 }
 
-.regist-form button:hover,
-.regist-form input[type="submit"]:hover {
+.regist-form .action-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.regist-form button:hover {
     color: #0A96A6;
     background: linear-gradient(to right, #f9f9f9, #0A96A6);
+}
+
+.regist-form .btn-prev {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--dark-color);
+    margin-right: 10%;
+}
+
+.regist-form .btn-prev:hover {
+    background-color: var(--primary-color);
+    color: var(--background-color);
 }
 
 .regist-form label {

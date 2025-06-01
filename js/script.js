@@ -143,6 +143,10 @@ function validateStep(step) {
                 alert('Las contraseñas no coinciden o están vacías.');
                 return false;
             }
+            if (passwd.length < 8) {
+                alert('La contraseña debe tener al menos 8 caracteres.');
+                return false;
+            }
             break;
         case 5:
             const tipo = document.querySelector('input[name="tipo"]:checked');

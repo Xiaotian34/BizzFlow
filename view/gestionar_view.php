@@ -100,10 +100,7 @@ if (isset($_POST['editar']) && isset($_POST['id'])) {
                                 <input type="hidden" name="id" value="<?php echo $archivo['id']; ?>">
                                 <input type="submit" name="editar" value="Editar">
                             </form>
-                            <a href="<?php echo htmlspecialchars($archivo['ruta_archivo']); ?>" target="_blank">
-                                <button type="button">Ver</button>
-                            </a>
-                            <a href="<?php echo htmlspecialchars($archivo['ruta_archivo']); ?>" download>
+                            <a class="btn-descargar" href="<?php echo htmlspecialchars($archivo['ruta_archivo']); ?>" download>
                                 <button type="button">Descargar</button>
                             </a>
                             <form action="" method="POST" style="display:inline;">

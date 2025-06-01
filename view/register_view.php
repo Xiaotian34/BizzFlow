@@ -30,21 +30,27 @@
                 <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" required>
                 <input type="hidden" name="edad" id="edad">
                 <br><br>
-                <button type="button" onclick="nextStep(1)">Siguiente</button>
+                <div class="action-buttons">
+                    <button type="button" class="btn-next" onclick="nextStep(1)">Siguiente</button>
+                </div>
             </div>
             <!-- Paso 2 -->
             <div class="step" id="step2" style="display:none;">
                 <label for="correo">Correo electrónico:</label>
                 <input type="email" name="correo" id="correo" required><br><br>
-                <button type="button" onclick="prevStep(2)">Anterior</button>
-                <button type="button" onclick="nextStep(2)">Siguiente</button>
+                <div class="action-buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(2)">Anterior</button>
+                    <button type="button" class="btn-next" onclick="nextStep(2)">Siguiente</button>
+                </div>
             </div>
             <!-- Paso 3 -->
             <div class="step" id="step3" style="display:none;">
                 <label for="telefono">Número de teléfono:</label>
-                <input type="tel" name="telefono" id="telefono" required placeholder="123456789" style="flex:1;">
-                <button type="button" onclick="prevStep(3)">Anterior</button>
-                <button type="button" onclick="nextStep(3)">Siguiente</button>
+                <input type="tel" name="telefono" id="telefono" required placeholder="000000" style="flex:1;">
+                <div class="action-buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(3)">Anterior</button>
+                    <button type="button" class="btn-next" onclick="nextStep(3)">Siguiente</button>
+                </div>
             </div>
             <!-- Paso 4 -->
             <div class="step" id="step4" style="display:none;">
@@ -52,8 +58,10 @@
                 <input type="password" name="passwd" id="passwd" required><br><br>
                 <label for="confpasswd">Confirmar contraseña:</label>
                 <input type="password" name="confpasswd" id="confpasswd" required><br><br>
-                <button type="button" onclick="prevStep(4)">Anterior</button>
-                <button type="button" onclick="nextStep(4)">Siguiente</button>
+                <div class="action-buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(4)">Anterior</button>
+                    <button type="button" class="btn-next" onclick="nextStep(4)">Siguiente</button>
+                </div>
             </div>
             <!-- Paso 5 -->
             <div class="step" id="step5" style="display:none;">
@@ -75,16 +83,20 @@
                     </label>
                 </div>
                 <br>
-                <button type="button" onclick="prevStep(5)">Anterior</button>
-                <button type="button" id="btnNext5" onclick="nextStep(5)">Finalizar</button>
+                <div class="action-buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(5)">Anterior</button>
+                    <button type="button" class="btn-next" id="btnNext5" onclick="nextStep(5)">Finalizar</button>
+                </div>
             </div>
             <!-- Paso 6 (solo para empresa) -->
             <div class="step" id="step6" style="display:none;">
                 <label for="nombre_empresa">Nombre de la empresa:</label>
                 <input type="text" name="nombre_empresa" id="nombre_empresa" required>
                 <br><br>
-                <button type="button" onclick="prevStep(6)">Anterior</button>
-                <button type="button" onclick="nextStep(6)">Finalizar</button>
+                <div class="action-buttons">
+                    <button type="button" class="btn-prev" onclick="prevStep(6)">Anterior</button>
+                    <button type="button" class="btn-next" onclick="nextStep(6)">Finalizar</button>
+                </div>
             </div>
         </form>
     

@@ -73,6 +73,8 @@ function registro(){
                 $message = "Todos los campos son obligatorios";
             } else if ($contra !== $confirm) {
                 $message = "Las contraseñas no coinciden";
+            } else if (strlen($contra) < 8) {
+                $message = "La contraseña debe tener al menos 8 caracteres";
             } else if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
                 $message = "El correo electrónico no es válido";
             } else if ($edad < 18) {
