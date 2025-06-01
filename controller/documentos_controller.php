@@ -137,20 +137,36 @@ function convertirExcelXml() {
             $correoUsuario = preg_replace('/[^A-Za-z0-9_\-@.]/', '_', $correoUsuario);
             $fechaActual = date("Y-m-d_H-i-s");
 
+<<<<<<< HEAD
             // Rutas organizadas: documentos/[usuario]/excel/ y documentos/[usuario]/xml/
             $carpetaExcel = __DIR__ . "/../documentos/" . $correoUsuario . "/excel/";
             $carpetaXml   = __DIR__ . "/../documentos/" . $correoUsuario . "/xml/";
 
             if (!is_dir($carpetaExcel)) {
                 mkdir($carpetaExcel, 0777, true);
+=======
+            $carpetaDestinoxlsx = __DIR__ . "/../documentos/" . $correoUsuario . "/excel/ ";
+            $carpetaDestinoxml = __DIR__ . "/../documentos/" . $correoUsuario . "/xml/ ";
+
+            if (!is_dir($carpetaDestinoxlsx)) {
+                mkdir($carpetaDestinoxlsx, 0777, true);
+            }
+            if (!is_dir($carpetaDestinoxml)) {
+                mkdir($carpetaDestinoxml, 0777, true);
+>>>>>>> eb0bd94d3184cef822e2392718bc86367c26337c
             }
             if (!is_dir($carpetaXml)) {
                 mkdir($carpetaXml, 0777, true);
             }
 
             $nombreBase = $fechaActual;
+<<<<<<< HEAD
             $outputExcelFile = $carpetaExcel . $nombreBase . ".xlsx";
             $outputXMLFile   = $carpetaXml   . $nombreBase . ".xml";
+=======
+            $outputExcelFile = $carpetaDestinoxlsx . $nombreBase . ".xlsx";
+            $outputXMLFile = $carpetaDestinoxml . $nombreBase . ".xml";
+>>>>>>> eb0bd94d3184cef822e2392718bc86367c26337c
 
             // Recoge los datos del formulario - EMISOR
             $emisor_nif = $_POST['emisor_nif'] ?? '';
