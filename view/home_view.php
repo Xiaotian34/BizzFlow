@@ -102,7 +102,7 @@
                 <i class="fas fa-file-excel"></i>
                 <h3>Generar Factura-e</h3>
                 <p>Genera una factura electrónica con tus datos.</p>
-                <button class="feature-button" onclick="window.location.href='index.php?controlador=documentos&action=excelToXmlForm'">Seleccionar</button>
+                <button class="feature-button" onclick="window.location.href='index.php?controlador=documentos&action=convertirExcelXml'">Seleccionar</button>
             </div>
             <div class="feature-card">
                 <i class="fas fa-file-excel"></i>

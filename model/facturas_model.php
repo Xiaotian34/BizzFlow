@@ -11,7 +11,7 @@ class Facturas_Model {
 
     public function get_facturas_por_usuario($id_usuario) {
         $id_usuario = $this->db->real_escape_string($id_usuario);
-        $sql = "SELECT * FROM facturas WHERE id_usuario = '$id_usuario' ORDER BY fecha_emision DESC";
+        $sql = "SELECT * FROM facturas WHERE id_usuario = '$id_usuario' ORDER BY fecha_subida DESC";
         $consulta = $this->db->query($sql);
         while ($registro = $consulta->fetch_assoc()) {
             $this->facturas[] = $registro;
@@ -26,15 +26,13 @@ class Facturas_Model {
         return $consulta->fetch_assoc();
     }
 
-    public function insertar_factura($id_usuario, $fecha_emision, $xml_generado, $total, $ruta_pdf) {
+    public function insertar_factura($id_usuario, $nombre_archivo, $ruta_archivo) {
         $id_usuario = $this->db->real_escape_string($id_usuario);
-        $fecha_emision = $this->db->real_escape_string($fecha_emision);
-        $xml_generado = $this->db->real_escape_string($xml_generado);
-        $total = $this->db->real_escape_string($total);
-        $ruta_pdf = $this->db->real_escape_string($ruta_pdf);
+        $nombre_archivo = $this->db->real_escape_string($nombre_archivo);
+        $ruta_archivo = $this->db->real_escape_string($ruta_archivo);
 
-        $sql = "INSERT INTO facturas (id_usuario, fecha_emision, xml_generado, total, ruta_pdf)
-                VALUES ('$id_usuario', '$fecha_emision', '$xml_generado', '$total', '$ruta_pdf')";
+        $sql = "INSERT INTO facturas (id_usuario, nombre_archivo, ruta_archivo) 
+                VALUES ('$id_usuario', '$nombre_archivo', '$ruta_archivo')";
         return $this->db->query($sql);
     }
 

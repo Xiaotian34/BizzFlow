@@ -20,12 +20,19 @@ function gestionarDocumentos()
 {
     require_once("model/documentos_model.php");
     $documento = new Documentos_Model();
+    require_once("model/usuarios_model.php");
+    $usuarioModel = new Usuarios_Model();
 
     $message = "";
 
     // Borrar documento
     if (isset($_POST["borrar"])) {
         $id = isset($_POST["id"]) ? $_POST["id"] : '';
+        // Obtener la ruta del archivo antes de borrar
+        $doc = $documento->get_documento_by_id($id);
+        if ($doc && isset($doc['ruta_archivo']) && file_exists($doc['ruta_archivo'])) {
+            unlink($doc['ruta_archivo']); // Elimina el archivo físico
+        }
         if ($documento->eliminarDocumento($id)) {
             $message = "Documento borrado correctamente";
         } else {
@@ -46,7 +53,7 @@ function gestionarDocumentos()
         }
 
         if (move_uploaded_file($_FILES["documento"]["tmp_name"], $ruta)) {
-            $id_usuario = obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
+            $id_usuario = $usuarioModel->obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
             if ($documento->insertarDocumento($id_usuario, $nombre, $tipo, $ruta)) {
                 $message = "Documento subido correctamente";
             } else {
@@ -57,38 +64,46 @@ function gestionarDocumentos()
         }
     }
 
-    // Modificar documento (solo nombre, tipo y ruta, si se sube uno nuevo)
-    if (isset($_POST["modificar"])) {
+    // Renombrar documento (nombre y ruta)
+    if (isset($_POST["guardar_edicion"])) {
         $id = $_POST["id"];
-        $nombreNuevo = $_FILES["documento"]["name"] ?? null;
-        $rutaDestino = null;
-
-        if ($nombreNuevo) {
-            $carpetaDestino = "documentos/";
-            $rutaDestino = $carpetaDestino . $nombreNuevo;
-
-            $documentoAntiguo = $documento->get_documento_by_id($id);
-            if (file_exists($documentoAntiguo["ruta_archivo"])) {
-                unlink($documentoAntiguo["ruta_archivo"]);
+        $nuevo_nombre = trim($_POST["nuevo_nombre"]);
+        $doc = $documento->get_documento_by_id($id);
+        if ($doc) {
+            $ruta_antigua = $doc["ruta_archivo"];
+            $extension = pathinfo($ruta_antigua, PATHINFO_EXTENSION);
+            // Si el usuario no pone la extensión, la añadimos
+            if (strtolower(pathinfo($nuevo_nombre, PATHINFO_EXTENSION)) !== strtolower($extension)) {
+                $nuevo_nombre .= "." . $extension;
             }
+            $nueva_ruta = dirname($ruta_antigua) . "/" . $nuevo_nombre;
 
-            move_uploaded_file($_FILES["documento"]["tmp_name"], $rutaDestino);
+            // Renombrar archivo físico si el nombre ha cambiado
+            if ($ruta_antigua !== $nueva_ruta) {
+                if (file_exists($ruta_antigua)) {
+                    if (rename($ruta_antigua, $nueva_ruta)) {
+                        // Actualizar en la base de datos
+                        if ($documento->modificarDocumento($id, $nuevo_nombre, $nueva_ruta)) {
+                            $message = "Nombre de archivo actualizado correctamente";
+                        } else {
+                            $message = "Error al actualizar en la base de datos";
+                        }
+                    } else {
+                        $message = "No se pudo renombrar el archivo físico";
+                    }
+                } else {
+                    $message = "El archivo original no existe";
+                }
+            } else {
+                $message = "El nombre es igual al actual";
+            }
         } else {
-            $rutaDestino = $documento->get_documento_by_id($id)["ruta_archivo"];
-            $nombreNuevo = basename($rutaDestino);
-        }
-
-        $tipoNuevo = pathinfo($nombreNuevo, PATHINFO_EXTENSION);
-
-        if ($documento->modificarDocumento($id, $nombreNuevo, $rutaDestino)) {
-            $message = "Documento modificado correctamente";
-        } else {
-            $message = "Error al modificar";
+            $message = "Documento no encontrado";
         }
     }
 
     // Obtener todos los documentos
-    $id_usuario = obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
+    $id_usuario = $usuarioModel->obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
     $array_documentos = $documento->get_documentos_por_usuario($id_usuario);
     require_once("view/gestionar_view.php");
 }
@@ -97,279 +112,76 @@ function estadisticas()
 {
     require_once("model/documentos_model.php");
     $documento = new Documentos_Model();
+    require_once("model/usuarios_model.php");
+    $usuarioModel = new Usuarios_Model();
 
     $message = "";
 
     // Obtener todos los documentos
-    $id_usuario = obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
+    $id_usuario = $usuarioModel->obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
     $array_documentos = $documento->get_documentos_por_usuario($id_usuario);
     require_once("view/estadisticas_view.php");
-}
-
-function excelToXmlForm() {
-    require_once("model/documentos_model.php");
-    $documento = new Documentos_Model();
-    
-    echo "aqui 1";
-    if (isset($_POST["convertir"])) {
-        echo "aqui 2";
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
-            echo "aqui 3";
-            try {
-                // Guardar archivo temporalmente
-                $excelTmp = $_FILES['excel_file']['tmp_name'];
-                $excelName = $_FILES['excel_file']['name'];
-                $destPath = __DIR__ . '/../uploads/' . uniqid() . '_' . $excelName;
-                move_uploaded_file($excelTmp, $destPath);
-
-                $outputFile = "C:\\xampp\\htdocs\\proyecto\\BizzFlow\\pruebas_output\\output.xlsx";
-
-                // Leer Excel con PhpSpreadsheet
-                $reader = IOFactory::createReader('Xlsx');
-                $spreadsheet = $reader->load($destPath);
-                $worksheet = $spreadsheet->getActiveSheet();
-
-                // Ejemplo: leer datos de la primera fila (ajusta según tu plantilla)
-                $concepto = $worksheet->getCell('A2')->getValue();
-                $importe = $worksheet->getCell('B2')->getValue();
-
-                // Recoge los datos del formulario
-                $fecha = $_POST['fecha'];
-                $nombreApellido = $_POST['nombre'];
-                $NFactura = $_POST['nfactura'];
-                $direccion = $_POST['direccion'];
-                $telefono = $_POST['telefono'];
-                $codigo_postal = $_POST['codigo_postal'];
-                $ciudad = $_POST['ciudad'];
-                $cliente_nombre = $_POST['cliente_nombre'];
-                $cliente_nif = $_POST['cliente_nif'];
-                $cliente_domicilio = $_POST['cliente_domicilio'];
-                $cliente_cp = $_POST['cliente_cp'];
-                $cliente_telefono = $_POST['cliente_telefono'];
-
-                // Recoge los nuevos datos del formulario
-                $provincia = $_POST['provincia'] ?? '';
-                $pais = $_POST['pais'] ?? 'ESP';
-                $cliente_provincia = $_POST['cliente_provincia'] ?? '';
-                $cliente_pais = $_POST['cliente_pais'] ?? 'ESP';
-
-                // Recoge los items de la factura
-                $item_descripcion = isset($_POST['item_descripcion']) ? $_POST['item_descripcion'] : [];
-                $item_cantidad = isset($_POST['item_cantidad']) ? $_POST['item_cantidad'] : [];
-                $item_precio = isset($_POST['item_precio']) ? $_POST['item_precio'] : [];
-                $item_total = isset($_POST['item_total']) ? $_POST['item_total'] : [];
-
-                // Crear nuevo spreadsheet
-                $newSpreadsheet = new Spreadsheet();
-                $newWorksheet = $newSpreadsheet->getActiveSheet();
-
-                // Añadir datos al Excel
-                $newWorksheet->setCellValue('A1', 'Cliente');
-                $newWorksheet->setCellValue('B1', 'Domicilio');
-                $newWorksheet->setCellValue('C1', 'Fecha');
-                $newWorksheet->setCellValue('D1', 'NºFactura');
-                $newWorksheet->setCellValue('E1', 'Concepto');
-                $newWorksheet->setCellValue('F1', 'Precio');
-                $newWorksheet->setCellValue('G1', 'Total');
-
-                // Escribir valores del formulario en fila 2
-                $newWorksheet->setCellValue('A2', $cliente_nombre);
-                $newWorksheet->setCellValue('B2', $cliente_domicilio);
-                $newWorksheet->setCellValue('C2', $fecha);
-                $newWorksheet->setCellValue('D2', $NFactura);
-                $newWorksheet->setCellValue('E2', $concepto);
-                
-                if (is_numeric($importe)) {
-                    $newWorksheet->setCellValue('F2', (float)$importe);
-                } else {
-                    $newWorksheet->setCellValue('F2', 'Monto inválido');
-                }
-
-                // Cabeceras
-                $newWorksheet->setCellValue('A1', 'Descripción');
-                $newWorksheet->setCellValue('B1', 'Cantidad');
-                $newWorksheet->setCellValue('C1', 'Precio');
-                $newWorksheet->setCellValue('D1', 'Total');
-
-                // Escribir los items
-                $fila = 2;
-                for ($i = 0; $i < count($item_descripcion); $i++) {
-                    $newWorksheet->setCellValue('A' . $fila, $item_descripcion[$i]);
-                    $newWorksheet->setCellValue('B' . $fila, $item_cantidad[$i]);
-                    $newWorksheet->setCellValue('C' . $fila, $item_precio[$i]);
-                    $newWorksheet->setCellValue('D' . $fila, $item_total[$i]);
-                    $fila++;
-                }
-
-                // Guardar archivo Excel
-                $writer = new Xlsx($newSpreadsheet);
-                $writer->save($outputFile);
-                echo "Datos guardados correctamente.";
-
-                // Generación de XML Facturae 3.2.2
-                $xml = new DOMDocument('1.0', 'UTF-8');
-                $xml->formatOutput = true;
-
-                $facturae = $xml->createElementNS('http://www.facturae.es/Facturae/2014/v3.2.2/Facturae', 'Facturae');
-                $facturae->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-                $facturae->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'xsi:schemaLocation', 'http://www.facturae.es/Facturae/2014/v3.2.2/Facturae Facturaev3_2_2.xsd');
-
-                // FileHeader
-                $fileHeader = $xml->createElement('FileHeader');
-                $fileHeader->appendChild($xml->createElement('SchemaVersion', '3.2.2'));
-                $fileHeader->appendChild($xml->createElement('Modality', 'I'));
-                $fileHeader->appendChild($xml->createElement('InvoiceIssuerType', 'EM'));
-                $facturae->appendChild($fileHeader);
-
-                // Parties
-                $parties = $xml->createElement('Parties');
-
-                // SellerParty (Emisor)
-                $seller = $xml->createElement('SellerParty');
-                $taxId = $xml->createElement('TaxIdentification');
-                $taxId->appendChild($xml->createElement('PersonTypeCode', 'F'));
-                $taxId->appendChild($xml->createElement('ResidenceTypeCode', 'R'));
-                $taxId->appendChild($xml->createElement('TaxIdentificationNumber', htmlspecialchars($cliente_nif)));
-                $seller->appendChild($taxId);
-
-                $individual = $xml->createElement('Individual');
-                $individual->appendChild($xml->createElement('Name', htmlspecialchars($nombreApellido)));
-                $seller->appendChild($individual);
-
-                $address = $xml->createElement('AddressInSpain');
-                $address->appendChild($xml->createElement('Address', htmlspecialchars($direccion)));
-                $address->appendChild($xml->createElement('PostCode', htmlspecialchars($codigo_postal)));
-                $address->appendChild($xml->createElement('Town', htmlspecialchars($ciudad)));
-                $address->appendChild($xml->createElement('Province', htmlspecialchars($provincia)));
-                $address->appendChild($xml->createElement('CountryCode', htmlspecialchars($pais)));
-                $seller->appendChild($address);
-
-                $parties->appendChild($seller);
-
-                // BuyerParty (Receptor)
-                $buyer = $xml->createElement('BuyerParty');
-                $taxId2 = $xml->createElement('TaxIdentification');
-                $taxId2->appendChild($xml->createElement('PersonTypeCode', 'F'));
-                $taxId2->appendChild($xml->createElement('ResidenceTypeCode', 'R'));
-                $taxId2->appendChild($xml->createElement('TaxIdentificationNumber', htmlspecialchars($cliente_nif)));
-                $buyer->appendChild($taxId2);
-
-                $individual2 = $xml->createElement('Individual');
-                $individual2->appendChild($xml->createElement('Name', htmlspecialchars($cliente_nombre)));
-                $buyer->appendChild($individual2);
-
-                $address2 = $xml->createElement('AddressInSpain');
-                $address2->appendChild($xml->createElement('Address', htmlspecialchars($cliente_domicilio)));
-                $address2->appendChild($xml->createElement('PostCode', htmlspecialchars($cliente_cp)));
-                $address2->appendChild($xml->createElement('Town', htmlspecialchars($ciudad)));
-                $address2->appendChild($xml->createElement('Province', htmlspecialchars($cliente_provincia)));
-                $address2->appendChild($xml->createElement('CountryCode', htmlspecialchars($cliente_pais)));
-                $buyer->appendChild($address2);
-
-                $parties->appendChild($buyer);
-
-                $facturae->appendChild($parties);
-
-                // Invoices
-                $invoices = $xml->createElement('Invoices');
-                $invoice = $xml->createElement('Invoice');
-                $invoice->appendChild($xml->createElement('InvoiceNumber', htmlspecialchars($NFactura)));
-                $invoice->appendChild($xml->createElement('InvoiceSeriesCode', 'A'));
-                $invoice->appendChild($xml->createElement('InvoiceDocumentType', 'FC'));
-                $invoice->appendChild($xml->createElement('InvoiceClass', 'OO'));
-                $invoice->appendChild($xml->createElement('IssueDate', htmlspecialchars($fecha)));
-
-                // Totales
-                $totalFactura = 0;
-                foreach ($item_total as $t) $totalFactura += floatval($t);
-                $totalConIva = $totalFactura + ($totalFactura * floatval($iva) / 100);
-
-                $invoiceTotals = $xml->createElement('InvoiceTotals');
-                $invoiceTotals->appendChild($xml->createElement('TotalGrossAmount', number_format($totalFactura, 2, '.', '')));
-                $invoiceTotals->appendChild($xml->createElement('TotalTaxOutputs', number_format($totalFactura * floatval($iva) / 100, 2, '.', '')));
-                $invoiceTotals->appendChild($xml->createElement('TotalInvoiceAmount', number_format($totalConIva, 2, '.', '')));
-                $invoice->appendChild($invoiceTotals);
-
-                // InvoiceLines
-                $invoiceLines = $xml->createElement('Items');
-                for ($i = 0; $i < count($item_descripcion); $i++) {
-                    $line = $xml->createElement('InvoiceLine');
-                    $line->appendChild($xml->createElement('ItemDescription', htmlspecialchars($item_descripcion[$i])));
-                    $line->appendChild($xml->createElement('Quantity', number_format($item_cantidad[$i], 2, '.', '')));
-                    $line->appendChild($xml->createElement('UnitOfMeasure', '01'));
-                    $line->appendChild($xml->createElement('UnitPriceWithoutTax', number_format($item_precio[$i], 2, '.', '')));
-                    $line->appendChild($xml->createElement('TotalCost', number_format($item_total[$i], 2, '.', '')));
-                    // Taxes
-                    $taxesOutputs = $xml->createElement('TaxesOutputs');
-                    $tax = $xml->createElement('Tax');
-                    $tax->appendChild($xml->createElement('TaxTypeCode', '01'));
-                    $tax->appendChild($xml->createElement('TaxRate', number_format($iva, 2, '.', '')));
-                    $tax->appendChild($xml->createElement('TaxableBase', number_format($item_total[$i], 2, '.', '')));
-                    $taxesOutputs->appendChild($tax);
-                    $line->appendChild($taxesOutputs);
-                    $invoiceLines->appendChild($line);
-                }
-                $invoice->appendChild($invoiceLines);
-
-                $invoices->appendChild($invoice);
-                $facturae->appendChild($invoices);
-
-                $xml->appendChild($facturae);
-
-                // Guardar XML
-                $xml->formatOutput = true;
-                $xmlOutputFile = "C:\\xampp\\htdocs\\proyecto\\BizzFlow\\pruebas_output\\output.xml";
-                $xml->save($xmlOutputFile);
-
-                echo "XML semántico creado correctamente.";
-                
-                // Limpiar archivo temporal
-                unlink($destPath);
-                
-            } catch (Exception $e) {
-                echo "Error al procesar el archivo: " . $e->getMessage();
-            }
-        } else {
-            echo "Error al procesar el archivo.";
-        }
-    }
-    require_once("view/excel_to_xml_view.php");
 }
 
 function convertirExcelXml() {
     if (isset($_POST["convertir"])) {
         try {
+            require_once("model/documentos_model.php");
+            require_once("model/usuarios_model.php");
+            require_once("model/facturas_model.php"); // Añade el modelo de facturas
+            $documento = new Documentos_Model();
+            $usuarioModel = new Usuarios_Model();
+            $facturaModel = new Facturas_Model(); // Instancia del modelo de facturas
+
             $correoUsuario = $_SESSION["correo"];
             $correoUsuario = preg_replace('/[^A-Za-z0-9_\-@.]/', '_', $correoUsuario);
             $fechaActual = date("Y-m-d_H-i-s");
-            $carpetaDestino = __DIR__ . "/../documentos/" . $correoUsuario . "/" . $fechaActual . "/";
-            if (!is_dir($carpetaDestino)) {
-                mkdir($carpetaDestino, 0777, true);
+
+            // Rutas organizadas: documentos/[usuario]/excel/ y documentos/[usuario]/xml/
+            $carpetaExcel = __DIR__ . "/../documentos/" . $correoUsuario . "/excel/";
+            $carpetaXml   = __DIR__ . "/../documentos/" . $correoUsuario . "/xml/";
+
+            if (!is_dir($carpetaExcel)) {
+                mkdir($carpetaExcel, 0777, true);
             }
+            if (!is_dir($carpetaXml)) {
+                mkdir($carpetaXml, 0777, true);
+            }
+
             $nombreBase = $fechaActual;
-            $outputExcelFile = $carpetaDestino . $nombreBase . ".xlsx";
-            $outputXMLFile = $carpetaDestino . $nombreBase . ".xml";
+            $outputExcelFile = $carpetaExcel . $nombreBase . ".xlsx";
+            $outputXMLFile   = $carpetaXml   . $nombreBase . ".xml";
 
-            // Recoge los datos del formulario
-            $fecha = $_POST['fecha'] ?? '';
-            $nombreApellido = $_POST['nombre'] ?? '';
-            $NFactura = $_POST['nfactura'] ?? '';
-            $direccion = $_POST['direccion'] ?? '';
-            $telefono = $_POST['telefono'] ?? '';
-            $codigo_postal = $_POST['codigo_postal'] ?? '';
-            $ciudad = $_POST['ciudad'] ?? '';
-            $cliente_nombre = $_POST['cliente_nombre'] ?? '';
+            // Recoge los datos del formulario - EMISOR
+            $emisor_nif = $_POST['emisor_nif'] ?? '';
+            $emisor_nombre = $_POST['emisor_nombre'] ?? '';
+            $emisor_direccion = $_POST['emisor_direccion'] ?? '';
+            $emisor_cp = $_POST['emisor_cp'] ?? '';
+            $emisor_ciudad = $_POST['emisor_ciudad'] ?? '';
+            $emisor_provincia = $_POST['emisor_provincia'] ?? '';
+            $emisor_pais = $_POST['emisor_pais'] ?? 'ESP';
+            $emisor_telefono = $_POST['emisor_telefono'] ?? ''; // FIX: Variable was missing
+            $emisor_email = $_POST['emisor_email'] ?? '';
+
+            // Recoge los datos del formulario - CLIENTE
             $cliente_nif = $_POST['cliente_nif'] ?? '';
-            $cliente_domicilio = $_POST['cliente_domicilio'] ?? '';
+            $cliente_nombre = $_POST['cliente_nombre'] ?? '';
+            $cliente_direccion = $_POST['cliente_direccion'] ?? '';
             $cliente_cp = $_POST['cliente_cp'] ?? '';
-            $cliente_telefono = $_POST['cliente_telefono'] ?? '';
-            $iva = $_POST['ivaPorcentaje'] ?? 21;
-
-            // Recoge los nuevos datos del formulario
-            $provincia = $_POST['provincia'] ?? '';
-            $pais = $_POST['pais'] ?? 'ESP';
+            $cliente_ciudad = $_POST['cliente_ciudad'] ?? '';
             $cliente_provincia = $_POST['cliente_provincia'] ?? '';
             $cliente_pais = $_POST['cliente_pais'] ?? 'ESP';
+            $cliente_telefono = $_POST['cliente_telefono'] ?? ''; // FIX: Variable was missing
+            $cliente_email = $_POST['cliente_email'] ?? '';
+
+            // Datos de la factura
+            $fecha = $_POST['fecha'] ?? '';
+            $NFactura = $_POST['nfactura'] ?? '';
+            $iva = $_POST['ivaPorcentaje'] ?? 21;
+
+            // FIX: Variables that were used but not defined - removing unused variables
+            // These variables were referenced but not used consistently:
+            // $provincia, $pais - these seem to be duplicates of emisor_provincia/emisor_pais
 
             // Recoge los items de la factura
             $item_descripcion = $_POST['item_descripcion'] ?? [];
@@ -382,34 +194,46 @@ function convertirExcelXml() {
             $worksheet = $spreadsheet->getActiveSheet();
 
             // Cabeceras de datos generales
-            $worksheet->setCellValue('A1', 'Remitente');
-            $worksheet->setCellValue('B1', 'Dirección');
-            $worksheet->setCellValue('C1', 'Teléfono');
-            $worksheet->setCellValue('D1', 'Código Postal');
-            $worksheet->setCellValue('E1', 'Ciudad');
-            $worksheet->setCellValue('F1', 'Fecha');
-            $worksheet->setCellValue('G1', 'NºFactura');
-            $worksheet->setCellValue('H1', 'Cliente');
-            $worksheet->setCellValue('I1', 'NIF/NIE/DNI');
-            $worksheet->setCellValue('J1', 'Domicilio Cliente');
-            $worksheet->setCellValue('K1', 'CP Cliente');
-            $worksheet->setCellValue('L1', 'Teléfono Cliente');
-            $worksheet->setCellValue('M1', 'IVA (%)');
+            $worksheet->setCellValue('A1', 'Emisor');
+            $worksheet->setCellValue('B1', 'Dirección Emisor');
+            $worksheet->setCellValue('C1', 'Teléfono Emisor');
+            $worksheet->setCellValue('D1', 'CP Emisor');
+            $worksheet->setCellValue('E1', 'Ciudad Emisor');
+            $worksheet->setCellValue('F1', 'Provincia Emisor');
+            $worksheet->setCellValue('G1', 'País Emisor');
+            $worksheet->setCellValue('H1', 'Email Emisor');
+            $worksheet->setCellValue('I1', 'Cliente');
+            $worksheet->setCellValue('J1', 'Dirección Cliente');
+            $worksheet->setCellValue('K1', 'Teléfono Cliente');
+            $worksheet->setCellValue('L1', 'CP Cliente');
+            $worksheet->setCellValue('M1', 'Ciudad Cliente');
+            $worksheet->setCellValue('N1', 'Provincia Cliente');
+            $worksheet->setCellValue('O1', 'País Cliente');
+            $worksheet->setCellValue('P1', 'Email Cliente');
+            $worksheet->setCellValue('Q1', 'Fecha');
+            $worksheet->setCellValue('R1', 'NºFactura');
+            $worksheet->setCellValue('S1', 'IVA (%)');
 
             // Datos generales en fila 2
-            $worksheet->setCellValue('A2', $nombreApellido);
-            $worksheet->setCellValue('B2', $direccion);
-            $worksheet->setCellValue('C2', $telefono);
-            $worksheet->setCellValue('D2', $codigo_postal);
-            $worksheet->setCellValue('E2', $ciudad);
-            $worksheet->setCellValue('F2', $fecha);
-            $worksheet->setCellValue('G2', $NFactura);
-            $worksheet->setCellValue('H2', $cliente_nombre);
-            $worksheet->setCellValue('I2', $cliente_nif);
-            $worksheet->setCellValue('J2', $cliente_domicilio);
-            $worksheet->setCellValue('K2', $cliente_cp);
-            $worksheet->setCellValue('L2', $cliente_telefono);
-            $worksheet->setCellValue('M2', $iva);
+            $worksheet->setCellValue('A2', $emisor_nombre);
+            $worksheet->setCellValue('B2', $emisor_direccion);
+            $worksheet->setCellValue('C2', $emisor_telefono); // FIX: Now properly defined
+            $worksheet->setCellValue('D2', $emisor_cp);
+            $worksheet->setCellValue('E2', $emisor_ciudad);
+            $worksheet->setCellValue('F2', $emisor_provincia);
+            $worksheet->setCellValue('G2', $emisor_pais);
+            $worksheet->setCellValue('H2', $emisor_email);
+            $worksheet->setCellValue('I2', $cliente_nombre);
+            $worksheet->setCellValue('J2', $cliente_direccion);
+            $worksheet->setCellValue('K2', $cliente_telefono); // FIX: Now properly defined
+            $worksheet->setCellValue('L2', $cliente_cp);
+            $worksheet->setCellValue('M2', $cliente_ciudad);
+            $worksheet->setCellValue('N2', $cliente_provincia);
+            $worksheet->setCellValue('O2', $cliente_pais);
+            $worksheet->setCellValue('P2', $cliente_email);
+            $worksheet->setCellValue('Q2', $fecha);
+            $worksheet->setCellValue('R2', $NFactura);
+            $worksheet->setCellValue('S2', $iva);
 
             // Cabeceras de items
             $worksheet->setCellValue('A4', 'Descripción');
@@ -440,6 +264,14 @@ function convertirExcelXml() {
             // Guardar archivo Excel
             $writer = new Xlsx($spreadsheet);
             $writer->save($outputExcelFile);
+
+            // GUARDAR DOCUMENTO EN BASE DE DATOS
+            $id_usuario = $usuarioModel->obtenerIdUsuarioPorCorreo($_SESSION["correo"]);
+            $nombre_archivo = $nombreBase . ".xlsx";
+            $tipo = "xlsx";
+            $ruta_archivo = "documentos/" . $correoUsuario . "/excel/" . $nombre_archivo; // Ruta relativa para la BD
+
+            $documento->insertarDocumento($id_usuario, $nombre_archivo, $tipo, $ruta_archivo);
 
             // Calcular totales
             $totalFactura = 0;
@@ -487,33 +319,34 @@ function convertirExcelXml() {
 
             // Parties
             $parties = $xml->createElement('Parties');
-            // SellerParty
+            // SellerParty (EMISOR)
             $seller = $xml->createElement('SellerParty');
             $taxId = $xml->createElement('TaxIdentification');
             $taxId->appendChild($xml->createElement('PersonTypeCode', 'F'));
             $taxId->appendChild($xml->createElement('ResidenceTypeCode', 'R'));
-            $taxId->appendChild($xml->createElement('TaxIdentificationNumber', htmlspecialchars($cliente_nif)));
+            $taxId->appendChild($xml->createElement('TaxIdentificationNumber', htmlspecialchars($emisor_nif))); // FIX: Was using $cliente_nif incorrectly
             $seller->appendChild($taxId);
 
             $individual = $xml->createElement('Individual');
-            $individual->appendChild($xml->createElement('Name', htmlspecialchars($nombreApellido)));
+            $individual->appendChild($xml->createElement('Name', htmlspecialchars($emisor_nombre))); // FIX: Was using undefined $nombreApellido
             $seller->appendChild($individual);
 
             $address = $xml->createElement('AddressInSpain');
-            $address->appendChild($xml->createElement('Address', htmlspecialchars($direccion)));
-            $address->appendChild($xml->createElement('PostCode', htmlspecialchars($codigo_postal)));
-            $address->appendChild($xml->createElement('Town', htmlspecialchars($ciudad)));
-            $address->appendChild($xml->createElement('Province', htmlspecialchars($provincia)));
-            $address->appendChild($xml->createElement('CountryCode', htmlspecialchars($pais)));
+            $address->appendChild($xml->createElement('Address', htmlspecialchars($emisor_direccion))); // FIX: Was using undefined $direccion
+            $address->appendChild($xml->createElement('PostCode', htmlspecialchars($emisor_cp))); // FIX: Was using undefined $codigo_postal
+            $address->appendChild($xml->createElement('Town', htmlspecialchars($emisor_ciudad))); // FIX: Was using undefined $ciudad
+            $address->appendChild($xml->createElement('Province', htmlspecialchars($emisor_provincia))); // FIX: Was using undefined $provincia
+            $address->appendChild($xml->createElement('CountryCode', htmlspecialchars($emisor_pais))); // FIX: Was using undefined $pais
             $seller->appendChild($address);
 
             $contact = $xml->createElement('ContactDetails');
-            $contact->appendChild($xml->createElement('Telephone', htmlspecialchars($telefono)));
+            $contact->appendChild($xml->createElement('Telephone', htmlspecialchars($emisor_telefono))); // FIX: Was using undefined $telefono
+            $contact->appendChild($xml->createElement('ElectronicMail', htmlspecialchars($emisor_email)));
             $seller->appendChild($contact);
 
             $parties->appendChild($seller);
 
-            // BuyerParty
+            // BuyerParty (CLIENTE)
             $buyer = $xml->createElement('BuyerParty');
             $taxId2 = $xml->createElement('TaxIdentification');
             $taxId2->appendChild($xml->createElement('PersonTypeCode', 'F'));
@@ -526,15 +359,16 @@ function convertirExcelXml() {
             $buyer->appendChild($individual2);
 
             $address2 = $xml->createElement('AddressInSpain');
-            $address2->appendChild($xml->createElement('Address', htmlspecialchars($cliente_domicilio)));
+            $address2->appendChild($xml->createElement('Address', htmlspecialchars($cliente_direccion)));
             $address2->appendChild($xml->createElement('PostCode', htmlspecialchars($cliente_cp)));
-            $address2->appendChild($xml->createElement('Town', htmlspecialchars($ciudad)));
+            $address2->appendChild($xml->createElement('Town', htmlspecialchars($cliente_ciudad)));
             $address2->appendChild($xml->createElement('Province', htmlspecialchars($cliente_provincia)));
             $address2->appendChild($xml->createElement('CountryCode', htmlspecialchars($cliente_pais)));
             $buyer->appendChild($address2);
 
             $contact2 = $xml->createElement('ContactDetails');
-            $contact2->appendChild($xml->createElement('Telephone', htmlspecialchars($cliente_telefono)));
+            $contact2->appendChild($xml->createElement('Telephone', htmlspecialchars($cliente_telefono))); // FIX: Now properly defined
+            $contact2->appendChild($xml->createElement('ElectronicMail', htmlspecialchars($cliente_email)));
             $buyer->appendChild($contact2);
 
             $parties->appendChild($buyer);
@@ -569,7 +403,7 @@ function convertirExcelXml() {
             $taxableBase->appendChild($xml->createElement('TotalAmount', number_format($totalFactura, 2, '.', '')));
             $tax->appendChild($taxableBase);
             $taxAmount = $xml->createElement('TaxAmount');
-            $taxAmount->appendChild($xml->createElement('TotalAmount', number_format($totalIva, 2, '.', '')));
+            $taxAmount->appendChild($xml->createElement('TotalAmount', number_format($totalFactura * floatval($iva) / 100, 2, '.', '')));
             $tax->appendChild($taxAmount);
             $taxOutputs->appendChild($tax);
             $invoice->appendChild($taxOutputs);
@@ -621,24 +455,16 @@ function convertirExcelXml() {
             // Guardar XML
             $xml->save($outputXMLFile);
 
+            // GUARDAR FACTURA (XML) EN BASE DE DATOS
+            $nombre_archivo_xml = $nombreBase . ".xml";
+            $ruta_archivo_xml = "documentos/" . $correoUsuario . "/xml/" . $nombre_archivo_xml; // Ruta relativa para la BD
+
+            $facturaModel->insertar_factura($id_usuario, $nombre_archivo_xml, $ruta_archivo_xml);
+
             require_once("view/procesado_view.php");
         } catch (Exception $e) {
             echo "Error en la conversión: " . $e->getMessage();
         }
     }
+    require_once("view/excel_to_xml_view.php");
 }
-
-// Función auxiliar para obtener el id del usuario a partir del correo
-function obtenerIdUsuarioPorCorreo($correo)
-{
-    require_once("model/usuarios_model.php");
-    $usuarioModel = new Usuarios_Model();
-    $usuarios = $usuarioModel->get_usuarios();
-    foreach ($usuarios as $usuario) {
-        if ($usuario["correo_electronico"] === $correo) {
-            return $usuario["id"];
-        }
-    }
-    return null;
-}
-?>

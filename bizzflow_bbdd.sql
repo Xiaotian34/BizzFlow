@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 30-05-2025 a las 19:23:10
+-- Tiempo de generación: 01-06-2025 a las 11:53:17
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -18,10 +18,10 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `ddb254192`
+-- Base de datos: `bizzflow_bbdd`
 --
-CREATE DATABASE IF NOT EXISTS `ddb254192` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `ddb254192`;
+CREATE DATABASE IF NOT EXISTS `bizzflow_bbdd` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `bizzflow_bbdd`;
 
 -- --------------------------------------------------------
 
@@ -34,11 +34,18 @@ CREATE TABLE `documentos` (
   `id` int(11) NOT NULL,
   `id_usuario` int(11) NOT NULL,
   `nombre_archivo` varchar(255) NOT NULL,
-  `tipo` enum('excel','word','xml','pdf') NOT NULL,
+  `tipo` varchar(10) NOT NULL,
   `ruta_archivo` varchar(255) DEFAULT NULL,
   `fecha_subida` datetime DEFAULT current_timestamp(),
   `procesado` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `documentos`
+--
+
+INSERT INTO `documentos` (`id`, `id_usuario`, `nombre_archivo`, `tipo`, `ruta_archivo`, `fecha_subida`, `procesado`) VALUES
+(2, 16, '2025-06-01_11-50-19.xlsx', 'xlsx', 'documentos/butano@gmail.com/excel/2025-06-01_11-50-19.xlsx', '2025-06-01 11:50:21', 0);
 
 -- --------------------------------------------------------
 
@@ -139,7 +146,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `documentos`
 --
 ALTER TABLE `documentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `estadisticas`
