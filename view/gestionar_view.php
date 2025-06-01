@@ -108,11 +108,8 @@ if (isset($_POST['editar']) && isset($_POST['id'])) {
                             </a>
                             <form action="" method="POST" style="display:inline;">
                                 <input type="hidden" name="id" value="<?php echo $archivo['id']; ?>">
-                                <?php if ($archivo['origen'] === 'documento'): ?>
-                                    <input type="submit" name="borrar" value="Eliminar">
-                                <?php elseif ($archivo['origen'] === 'factura'): ?>
-                                    <input type="submit" name="borrar_factura" value="Eliminar">
-                                <?php endif; ?>
+                                <input type="hidden" name="origen" value="<?php echo $archivo['origen']; ?>">
+                                <input type="submit" name="borrar" value="Eliminar">
                             </form>
                         </td>
                     </tr>

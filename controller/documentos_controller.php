@@ -27,18 +27,33 @@ function gestionarDocumentos()
 
     $message = "";
 
-    // Borrar documento
+    // Borrar documento o factura
     if (isset($_POST["borrar"])) {
         $id = isset($_POST["id"]) ? $_POST["id"] : '';
-        // Obtener la ruta del archivo antes de borrar
-        $doc = $documento->get_documento_by_id($id);
-        if ($doc && isset($doc['ruta_archivo']) && file_exists($doc['ruta_archivo'])) {
-            unlink($doc['ruta_archivo']); // Elimina el archivo físico
-        }
-        if ($documento->eliminarDocumento($id)) {
-            $message = "Documento borrado correctamente";
-        } else {
-            $message = "Error al borrar documento";
+        $origen = isset($_POST["origen"]) ? $_POST["origen"] : 'documento';
+
+        if ($origen === 'documento') {
+            // Obtener la ruta del archivo antes de borrar
+            $doc = $documento->get_documento_by_id($id);
+            if ($doc && isset($doc['ruta_archivo']) && file_exists($doc['ruta_archivo'])) {
+                unlink($doc['ruta_archivo']); // Elimina el archivo físico
+            }
+            if ($documento->eliminarDocumento($id)) {
+                $message = "Documento borrado correctamente";
+            } else {
+                $message = "Error al borrar documento";
+            }
+        } elseif ($origen === 'factura') {
+            // Obtener la ruta del archivo antes de borrar
+            $fac = $facturaModel->get_factura_por_id($id);
+            if ($fac && isset($fac['ruta_archivo']) && file_exists($fac['ruta_archivo'])) {
+                unlink($fac['ruta_archivo']); // Elimina el archivo físico
+            }
+            if ($facturaModel->eliminar_factura($id)) {
+                $message = "Factura borrada correctamente";
+            } else {
+                $message = "Error al borrar factura";
+            }
         }
     }
 
@@ -157,6 +172,8 @@ function convertirExcelXml() {
             $outputXMLFile   = $carpetaXml   . $nombreBase . ".xml";
 
             // Recoge los datos del formulario - EMISOR
+            $emisor_tipo_persona = $_POST['emisor_tipo_persona'] ?? '';
+            $emisor_tipo_residencia = $_POST['emisor_tipo_residencia'] ?? '';
             $emisor_nif = $_POST['emisor_nif'] ?? '';
             $emisor_nombre = $_POST['emisor_nombre'] ?? '';
             $emisor_direccion = $_POST['emisor_direccion'] ?? '';
@@ -168,6 +185,8 @@ function convertirExcelXml() {
             $emisor_email = $_POST['emisor_email'] ?? '';
 
             // Recoge los datos del formulario - CLIENTE
+            $cliente_tipo_persona = $_POST['cliente_tipo_persona'] ?? '';
+            $cliente_tipo_residencia = $_POST['cliente_tipo_residencia'] ?? '';
             $cliente_nif = $_POST['cliente_nif'] ?? '';
             $cliente_nombre = $_POST['cliente_nombre'] ?? '';
             $cliente_direccion = $_POST['cliente_direccion'] ?? '';
@@ -181,6 +200,13 @@ function convertirExcelXml() {
             // Datos de la factura
             $fecha = $_POST['fecha'] ?? '';
             $NFactura = $_POST['nfactura'] ?? '';
+            $serie = $_POST['serie'] ?? '';
+            $tipo_documento = $_POST['tipo_documento'] ?? '';
+            $clase_factura = $_POST['clase_factura'] ?? '';
+            $moneda = $_POST['moneda'] ?? '';
+            $idioma = $_POST['idioma'] ?? '';
+            $forma_pago = trim($_POST['forma_pago'] ?? '');
+            $iban = trim($_POST['iban'] ?? '');
             $iva = $_POST['ivaPorcentaje'] ?? 21;
 
             // FIX: Variables that were used but not defined - removing unused variables
@@ -197,73 +223,99 @@ function convertirExcelXml() {
             $spreadsheet = new Spreadsheet();
             $worksheet = $spreadsheet->getActiveSheet();
 
-            // Cabeceras de datos generales
+            // Cabeceras de datos generales (añadir nuevas columnas)
             $worksheet->setCellValue('A1', 'Emisor');
-            $worksheet->setCellValue('B1', 'Dirección Emisor');
-            $worksheet->setCellValue('C1', 'Teléfono Emisor');
-            $worksheet->setCellValue('D1', 'CP Emisor');
-            $worksheet->setCellValue('E1', 'Ciudad Emisor');
-            $worksheet->setCellValue('F1', 'Provincia Emisor');
-            $worksheet->setCellValue('G1', 'País Emisor');
-            $worksheet->setCellValue('H1', 'Email Emisor');
-            $worksheet->setCellValue('I1', 'Cliente');
-            $worksheet->setCellValue('J1', 'Dirección Cliente');
-            $worksheet->setCellValue('K1', 'Teléfono Cliente');
-            $worksheet->setCellValue('L1', 'CP Cliente');
-            $worksheet->setCellValue('M1', 'Ciudad Cliente');
-            $worksheet->setCellValue('N1', 'Provincia Cliente');
-            $worksheet->setCellValue('O1', 'País Cliente');
-            $worksheet->setCellValue('P1', 'Email Cliente');
-            $worksheet->setCellValue('Q1', 'Fecha');
-            $worksheet->setCellValue('R1', 'NºFactura');
-            $worksheet->setCellValue('S1', 'IVA (%)');
+            $worksheet->setCellValue('B1', 'Tipo Persona Emisor');
+            $worksheet->setCellValue('C1', 'Tipo Residencia Emisor');
+            $worksheet->setCellValue('D1', 'NIF Emisor');
+            $worksheet->setCellValue('E1', 'Dirección Emisor');
+            $worksheet->setCellValue('F1', 'Teléfono Emisor');
+            $worksheet->setCellValue('G1', 'CP Emisor');
+            $worksheet->setCellValue('H1', 'Ciudad Emisor');
+            $worksheet->setCellValue('I1', 'Provincia Emisor');
+            $worksheet->setCellValue('J1', 'País Emisor');
+            $worksheet->setCellValue('K1', 'Email Emisor');
+            $worksheet->setCellValue('L1', 'Cliente');
+            $worksheet->setCellValue('M1', 'Tipo Persona Cliente');
+            $worksheet->setCellValue('N1', 'Tipo Residencia Cliente');
+            $worksheet->setCellValue('O1', 'NIF Cliente');
+            $worksheet->setCellValue('P1', 'Dirección Cliente');
+            $worksheet->setCellValue('Q1', 'Teléfono Cliente');
+            $worksheet->setCellValue('R1', 'CP Cliente');
+            $worksheet->setCellValue('S1', 'Ciudad Cliente');
+            $worksheet->setCellValue('T1', 'Provincia Cliente');
+            $worksheet->setCellValue('U1', 'País Cliente');
+            $worksheet->setCellValue('V1', 'Email Cliente');
+            $worksheet->setCellValue('W1', 'Fecha');
+            $worksheet->setCellValue('X1', 'NºFactura');
+            $worksheet->setCellValue('Y1', 'Serie');
+            $worksheet->setCellValue('Z1', 'Tipo Documento');
+            $worksheet->setCellValue('AA1', 'Clase Factura');
+            $worksheet->setCellValue('AB1', 'Moneda');
+            $worksheet->setCellValue('AC1', 'Idioma');
+            $worksheet->setCellValue('AD1', 'Forma de Pago');
+            $worksheet->setCellValue('AE1', 'IBAN');
+            $worksheet->setCellValue('AF1', 'IVA (%)');
 
             // Datos generales en fila 2
             $worksheet->setCellValue('A2', $emisor_nombre);
-            $worksheet->setCellValue('B2', $emisor_direccion);
-            $worksheet->setCellValue('C2', $emisor_telefono); // FIX: Now properly defined
-            $worksheet->setCellValue('D2', $emisor_cp);
-            $worksheet->setCellValue('E2', $emisor_ciudad);
-            $worksheet->setCellValue('F2', $emisor_provincia);
-            $worksheet->setCellValue('G2', $emisor_pais);
-            $worksheet->setCellValue('H2', $emisor_email);
-            $worksheet->setCellValue('I2', $cliente_nombre);
-            $worksheet->setCellValue('J2', $cliente_direccion);
-            $worksheet->setCellValue('K2', $cliente_telefono); // FIX: Now properly defined
-            $worksheet->setCellValue('L2', $cliente_cp);
-            $worksheet->setCellValue('M2', $cliente_ciudad);
-            $worksheet->setCellValue('N2', $cliente_provincia);
-            $worksheet->setCellValue('O2', $cliente_pais);
-            $worksheet->setCellValue('P2', $cliente_email);
-            $worksheet->setCellValue('Q2', $fecha);
-            $worksheet->setCellValue('R2', $NFactura);
-            $worksheet->setCellValue('S2', $iva);
+            $worksheet->setCellValue('B2', $emisor_tipo_persona);
+            $worksheet->setCellValue('C2', $emisor_tipo_residencia);
+            $worksheet->setCellValue('D2', $emisor_nif);
+            $worksheet->setCellValue('E2', $emisor_direccion);
+            $worksheet->setCellValue('F2', $emisor_telefono);
+            $worksheet->setCellValue('G2', $emisor_cp);
+            $worksheet->setCellValue('H2', $emisor_ciudad);
+            $worksheet->setCellValue('I2', $emisor_provincia);
+            $worksheet->setCellValue('J2', $emisor_pais);
+            $worksheet->setCellValue('K2', $emisor_email);
+            $worksheet->setCellValue('L2', $cliente_nombre);
+            $worksheet->setCellValue('M2', $cliente_tipo_persona);
+            $worksheet->setCellValue('N2', $cliente_tipo_residencia);
+            $worksheet->setCellValue('O2', $cliente_nif);
+            $worksheet->setCellValue('P2', $cliente_direccion);
+            $worksheet->setCellValue('Q2', $cliente_telefono);
+            $worksheet->setCellValue('R2', $cliente_cp);
+            $worksheet->setCellValue('S2', $cliente_ciudad);
+            $worksheet->setCellValue('T2', $cliente_provincia);
+            $worksheet->setCellValue('U2', $cliente_pais);
+            $worksheet->setCellValue('V2', $cliente_email);
+            $worksheet->setCellValue('W2', $fecha);
+            $worksheet->setCellValue('X2', $NFactura);
+            $worksheet->setCellValue('Y2', $serie);
+            $worksheet->setCellValue('Z2', $tipo_documento);
+            $worksheet->setCellValue('AA2', $clase_factura);
+            $worksheet->setCellValue('AB2', $moneda);
+            $worksheet->setCellValue('AC2', $idioma);
+            $worksheet->setCellValue('AD2', $forma_pago);
+            $worksheet->setCellValue('AE2', $iban);
+            $worksheet->setCellValue('AF2', $iva);
 
             // Cabeceras de items
-            $worksheet->setCellValue('A4', 'Descripción');
-            $worksheet->setCellValue('B4', 'Cantidad');
-            $worksheet->setCellValue('C4', 'Precio');
-            $worksheet->setCellValue('D4', 'Total');
+            $worksheet->setCellValue('AG1', 'Descripción');
+            $worksheet->setCellValue('AH1', 'Cantidad');
+            $worksheet->setCellValue('AI1', 'Precio');
+            $worksheet->setCellValue('AJ1', 'Total');
 
             // Escribir los items a partir de la fila 5
-            $fila = 5;
+            $fila = 2;
             $totalFactura = 0;
             for ($i = 0; $i < count($item_descripcion); $i++) {
-                $worksheet->setCellValue('A' . $fila, $item_descripcion[$i]);
-                $worksheet->setCellValue('B' . $fila, $item_cantidad[$i]);
-                $worksheet->setCellValue('C' . $fila, $item_precio[$i]);
-                $worksheet->setCellValue('D' . $fila, $item_total[$i]);
+                $worksheet->setCellValue('AG' . $fila, $item_descripcion[$i]);
+                $worksheet->setCellValue('AH' . $fila, $item_cantidad[$i]);
+                $worksheet->setCellValue('AI' . $fila, $item_precio[$i]);
+                $worksheet->setCellValue('AJ' . $fila, $item_total[$i]);
                 $totalFactura += floatval($item_total[$i]);
                 $fila++;
             }
 
             // Total y total con IVA
-            $worksheet->setCellValue('C' . $fila, 'Total');
-            $worksheet->setCellValue('D' . $fila, $totalFactura);
+            $worksheet->setCellValue('AI' . $fila, 'Total');
+            $worksheet->setCellValue('AJ' . $fila, $totalFactura);
             $fila++;
-            $worksheet->setCellValue('C' . $fila, 'Total con IVA');
+            $worksheet->setCellValue('AI' . $fila, 'Total con IVA');
             $totalConIva = $totalFactura + ($totalFactura * floatval($iva) / 100);
-            $worksheet->setCellValue('D' . $fila, $totalConIva);
+            $worksheet->setCellValue('AJ' . $fila, $totalConIva);
 
             // Guardar archivo Excel
             $writer = new Xlsx($spreadsheet);
@@ -326,9 +378,9 @@ function convertirExcelXml() {
             // SellerParty (EMISOR)
             $seller = $xml->createElement('SellerParty');
             $taxId = $xml->createElement('TaxIdentification');
-            $taxId->appendChild($xml->createElement('PersonTypeCode', 'F'));
-            $taxId->appendChild($xml->createElement('ResidenceTypeCode', 'R'));
-            $taxId->appendChild($xml->createElement('TaxIdentificationNumber', htmlspecialchars($emisor_nif))); // FIX: Was using $cliente_nif incorrectly
+            $taxId->appendChild($xml->createElement('PersonTypeCode', $emisor_tipo_persona));
+            $taxId->appendChild($xml->createElement('ResidenceTypeCode', $emisor_tipo_residencia));
+            $taxId->appendChild($xml->createElement('TaxIdentificationNumber', htmlspecialchars($emisor_nif)));
             $seller->appendChild($taxId);
 
             $individual = $xml->createElement('Individual');
@@ -353,8 +405,8 @@ function convertirExcelXml() {
             // BuyerParty (CLIENTE)
             $buyer = $xml->createElement('BuyerParty');
             $taxId2 = $xml->createElement('TaxIdentification');
-            $taxId2->appendChild($xml->createElement('PersonTypeCode', 'F'));
-            $taxId2->appendChild($xml->createElement('ResidenceTypeCode', 'R'));
+            $taxId2->appendChild($xml->createElement('PersonTypeCode', $cliente_tipo_persona));
+            $taxId2->appendChild($xml->createElement('ResidenceTypeCode', $cliente_tipo_residencia));
             $taxId2->appendChild($xml->createElement('TaxIdentificationNumber', htmlspecialchars($cliente_nif)));
             $buyer->appendChild($taxId2);
 
@@ -385,18 +437,28 @@ function convertirExcelXml() {
             // InvoiceHeader
             $invoiceHeader = $xml->createElement('InvoiceHeader');
             $invoiceHeader->appendChild($xml->createElement('InvoiceNumber', htmlspecialchars($NFactura)));
-            $invoiceHeader->appendChild($xml->createElement('InvoiceSeriesCode', 'A'));
-            $invoiceHeader->appendChild($xml->createElement('InvoiceDocumentType', 'FC'));
-            $invoiceHeader->appendChild($xml->createElement('InvoiceClass', 'OO'));
+            $invoiceHeader->appendChild($xml->createElement('InvoiceSeriesCode', htmlspecialchars($serie)));
+            $invoiceHeader->appendChild($xml->createElement('InvoiceDocumentType', htmlspecialchars($tipo_documento)));
+            $invoiceHeader->appendChild($xml->createElement('InvoiceClass', htmlspecialchars($clase_factura)));
             $invoice->appendChild($invoiceHeader);
 
             // InvoiceIssueData
             $invoiceIssueData = $xml->createElement('InvoiceIssueData');
             $invoiceIssueData->appendChild($xml->createElement('IssueDate', htmlspecialchars($fecha)));
-            $invoiceIssueData->appendChild($xml->createElement('InvoiceCurrencyCode', 'EUR'));
-            $invoiceIssueData->appendChild($xml->createElement('TaxCurrencyCode', 'EUR'));
-            $invoiceIssueData->appendChild($xml->createElement('LanguageName', 'es'));
+            $invoiceIssueData->appendChild($xml->createElement('InvoiceCurrencyCode', htmlspecialchars($moneda)));
+            $invoiceIssueData->appendChild($xml->createElement('TaxCurrencyCode', htmlspecialchars($moneda)));
+            $invoiceIssueData->appendChild($xml->createElement('LanguageName', htmlspecialchars($idioma)));
             $invoice->appendChild($invoiceIssueData);
+
+            // Forma de Pago (opcional)
+            if (!empty($forma_pago)) {
+                $paymentDetails = $xml->createElement('PaymentDetails');
+                $paymentDetails->appendChild($xml->createElement('PaymentMeans', htmlspecialchars($forma_pago)));
+                if (!empty($iban)) {
+                    $paymentDetails->appendChild($xml->createElement('AccountNumber', htmlspecialchars($iban)));
+                }
+                $invoice->appendChild($paymentDetails);
+            }
 
             // TaxOutputs
             $taxOutputs = $xml->createElement('TaxOutputs');

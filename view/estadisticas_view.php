@@ -20,6 +20,7 @@ try {
     $directorio = __DIR__ . "/../documentos/" . $correoUsuario . "/excel";
 
     $archivosFiltrados = [];
+    $facturas = []; // ¡IMPORTANTE! Inicializar la variable facturas
 
     $periodoDias = isset($_GET['period']) ? intval($_GET['period']) : 7;
     // Fechas de intervalo
@@ -54,6 +55,7 @@ try {
     $totalMonto = 0;
     $totalFacturas = 0;
     $clientesUnicos = [];
+    
     foreach ($archivosFiltrados as $archivo) {
         $rutaArchivo = $directorio . DIRECTORY_SEPARATOR . $archivo;
 
@@ -61,25 +63,37 @@ try {
             $spreadsheet = IOFactory::load($rutaArchivo);
             $hojaActiva = $spreadsheet->getActiveSheet();
             $datos = $hojaActiva->toArray();
-            $totalFacturas++;
+            
+            // Extraer fecha del nombre del archivo
+            $nombreSinExtension = pathinfo($archivo, PATHINFO_FILENAME);
+            $fechaArchivo = DateTime::createFromFormat('Y-m-d_H-i-s', $nombreSinExtension);
+            $fechaFactura = $fechaArchivo ? $fechaArchivo->format('Y-m-d') : date('Y-m-d');
 
             // Buscar la posición de "precio" en el primer array
             $indicePrecio = array_search("Precio", $datos[0]);
-
-            if ($indicePrecio != false) {
-                // Extraer el precio de los otros sub-arrays
-                for ($i = 1; $i < count($datos); $i++) {
-                    $totalMonto = $totalMonto + $datos[$i][$indicePrecio];
-                }
-            } else {
-                echo "No se encontró la columna 'precio'.";
-            }
-
-            // Buscar el índice de la columna "cliente"
             $indiceCliente = array_search("Cliente", $datos[0]);
 
-            if ($indiceCliente !== false) {
+            if ($indicePrecio !== false) {
+                // Extraer el precio de los otros sub-arrays
+                for ($i = 1; $i < count($datos); $i++) {
+                    $valor = $datos[$i][$indicePrecio];
+                    $montoItem = is_numeric($valor) ? floatval($valor) : 0;
+                    $totalMonto += $montoItem;
+                    
+                    // Agregar cada item como una factura para el gráfico
+                    $facturas[] = [
+                        'fecha' => $fechaFactura,
+                        'monto' => $montoItem,
+                        'cliente' => ($indiceCliente !== false && isset($datos[$i][$indiceCliente])) ? $datos[$i][$indiceCliente] : 'Cliente desconocido'
+                    ];
+                }
+                $totalFacturas++;
+            } else {
+                echo "No se encontró la columna 'precio' en $archivo.";
+            }
 
+            // Procesar clientes únicos
+            if ($indiceCliente !== false) {
                 // Recorrer los sub-arrays desde la fila 1 (omitimos cabecera)
                 for ($i = 1; $i < count($datos); $i++) {
                     $cliente = $datos[$i][$indiceCliente];
@@ -88,12 +102,13 @@ try {
                     }
                 }
             } else {
-                echo "No se encontró la columna 'cliente'.";
+                echo "No se encontró la columna 'cliente' en $archivo.";
             }
         } catch (Exception $e) {
             echo "Error al leer el archivo $archivo: " . $e->getMessage() . "\n";
         }
     }
+    
     // Obtener solo los nombres únicos
     $clientesUnicos = array_keys($clientesUnicos);
     // Antes de dividir por $totalFacturas, comprueba que no sea 0
@@ -105,10 +120,10 @@ try {
 } catch (Exception $e) {
     echo "Error al procesar el archivo Excel: " . $e->getMessage() . "\n";
     // Valores por defecto en caso de error
-    $totalMonto = "No Data";
-    $totalFacturas = "No Data";
-    $facturaPromedio = "No Data";
-    $clientesUnicos = "No Data";
+    $totalMonto = 0;
+    $totalFacturas = 0;
+    $facturaPromedio = 0;
+    $clientesUnicos = [];
     $facturas = [];
 }
 
@@ -139,44 +154,69 @@ if (!empty($facturas)) {
 }
 
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas de Facturas</title>
+    <link rel="stylesheet" href="css/stylesEstadisticas.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
 <div class="header">
-    <h1>Dashboard de Facturas</h1>
+    <h1>Estadísticas de Facturas</h1>
     <p>Análisis completo de tus ventas y facturación</p>
 
     <div class="period-selector">
-        <button id="1" class="period-btn" data-period="7">Últimos 7 días</button>
-        <button id="2" class="period-btn" data-period="30">Último mes</button>
-        <button id="3" class="period-btn" data-period="90">Últimos 3 meses</button>
-        <button id="4" class="period-btn" data-period="365">Último año</button>
+        <button class="period-btn" data-period="7">Últimos 7 días</button>
+        <button class="period-btn" data-period="30">Último mes</button>
+        <button class="period-btn" data-period="90">Últimos 3 meses</button>
+        <button class="period-btn" data-period="365">Último año</button>
     </div>
+    
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">💰</div>
-            <div class="stat-value" id="totalRevenue">€<?php echo number_format($totalMonto, 2); ?></div>
-            <div class="stat-label">Ingresos Totales</div>
+            <div class="stat-info">
+                <div class="stat-value" id="totalRevenue">€<?php echo number_format($totalMonto, 2); ?></div>
+                <div class="stat-label">Ingresos Totales</div>
+            </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📄</div>
-            <div class="stat-value" id="totalInvoices"><?php echo $totalFacturas; ?></div>
-            <div class="stat-label">Facturas Emitidas</div>
+            <div class="stat-info">
+                <div class="stat-value" id="totalInvoices"><?php echo $totalFacturas; ?></div>
+                <div class="stat-label">Facturas Emitidas</div>
+            </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">💳</div>
-            <div class="stat-value" id="avgInvoice">€<?php echo number_format($facturaPromedio, 2); ?></div>
-            <div class="stat-label">Factura Promedio</div>
+            <div class="stat-info">
+                <div class="stat-value" id="avgInvoice">€<?php echo number_format($facturaPromedio, 2); ?></div>
+                <div class="stat-label">Factura Promedio</div>
+            </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon" style="background: linear-gradient(135deg, #4bc0c8 0%, #c779d0 100%);">👥</div>
-            <div class="stat-value" id="activeClients"><?php echo count($clientesUnicos); ?></div>
-            <div class="stat-label">Clientes Activos</div>
+            <div class="stat-info">
+                <div class="stat-value" id="activeClients"><?php echo count($clientesUnicos); ?></div>
+                <div class="stat-label">Clientes Activos</div>
+            </div>
         </div>
     </div>
 </div>
-<div class="contenedor-grafico">
-    <canvas id="miGrafico" width="400" height="200"></canvas>
+
+<div class="charts-section">
+    <div class="chart-container">
+        <div class="chart-title">Evolución de Ingresos por Mes</div>
+        <div style="height:350px;">
+            <canvas id="miGrafico"></canvas>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -190,32 +230,45 @@ if (!empty($facturas)) {
         datasets: [{
             label: 'Ingresos Mensuales (€)',
             data: [<?php echo implode(', ', $datosGrafico); ?>],
-            fill: false,
+            fill: true,
             borderColor: 'rgb(75, 192, 192)',
-            backgroundColor: 'rgba(75, 192, 192, 0.1)',
-            tension: 0.1,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.4,
             pointBackgroundColor: 'rgb(75, 192, 192)',
             pointBorderColor: '#fff',
             pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgb(75, 192, 192)'
+            pointHoverBorderColor: 'rgb(75, 192, 192)',
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            borderWidth: 3
         }]
     };
 
     const ctx = document.getElementById('miGrafico').getContext('2d');
-
     const miGrafico = new Chart(ctx, {
         type: 'line',
         data: data,
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 title: {
                     display: true,
-                    text: 'Evolución de Ingresos por Mes'
+                    text: 'Evolución de Ingresos por Mes',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    color: '#333'
                 },
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14
+                        }
+                    }
                 }
             },
             scales: {
@@ -224,7 +277,23 @@ if (!empty($facturas)) {
                     ticks: {
                         callback: function(value, index, values) {
                             return '€' + value.toLocaleString();
+                        },
+                        font: {
+                            size: 12
                         }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
                     }
                 }
             },
@@ -243,9 +312,21 @@ if (!empty($facturas)) {
             // Agregar clase active al botón clickeado
             this.classList.add('active');
 
-            // Aquí puedes agregar lógica para filtrar datos según el período
+            // Redirigir con el nuevo período
             const period = this.dataset.period;
-            console.log('Período seleccionado:', period, 'días');
+            const url = new URL(window.location);
+            url.searchParams.set('period', period);
+            window.location.href = url.toString();
         });
     });
+
+    // Activar el botón correcto según el período actual
+    const currentPeriod = new URLSearchParams(window.location.search).get('period') || '7';
+    document.querySelectorAll('.period-btn').forEach(btn => {
+        if (btn.dataset.period === currentPeriod) {
+            btn.classList.add('active');
+        }
+    });
 </script>
+</body>
+</html>
