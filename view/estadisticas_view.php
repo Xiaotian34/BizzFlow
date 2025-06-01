@@ -15,8 +15,10 @@ require_once("view/menu_view.php");
 echo "Procesando con PhpSpreadsheet...\n";
 
 try {
+    // Cambia la ruta al directorio correcto y añade comprobación
+    $correoUsuario = $_SESSION['correo'];
+    $directorio = __DIR__ . "/../documentos/" . $correoUsuario . "/excel";
 
-    $directorio = "C:\\nuevoxampp\\htdocs\\proyecto\\BizzFlow\\BizzFlow\documentos\butano@gmail.com\\excel";
     $archivosFiltrados = [];
 
     $periodoDias = isset($_GET['period']) ? intval($_GET['period']) : 7;
@@ -25,23 +27,27 @@ try {
     $fechaInicio = (clone $hoy)->modify("-$periodoDias days");
 
     // Obtener lista de archivos
-    $archivos = scandir($directorio);
+    if (is_dir($directorio)) {
+        $archivos = scandir($directorio);
+        foreach ($archivos as $archivo) {
+            // Ignorar . y ..
+            if ($archivo === '.' || $archivo === '..') {
+                continue;
+            }
 
-    foreach ($archivos as $archivo) {
-        // Ignorar . y ..
-        if ($archivo === '.' || $archivo === '..') {
-            continue;
+            // Extraer nombre sin extensión
+            $nombreSinExtension = pathinfo($archivo, PATHINFO_FILENAME);
+
+            // Intentar crear objeto DateTime desde el nombre
+            $fechaArchivo = DateTime::createFromFormat('Y-m-d_H-i-s', $nombreSinExtension);
+
+            if ($fechaArchivo && $fechaArchivo >= $fechaInicio && $fechaArchivo <= $hoy) {
+                $archivosFiltrados[] = $archivo;
+            }
         }
-
-        // Extraer nombre sin extensión
-        $nombreSinExtension = pathinfo($archivo, PATHINFO_FILENAME);
-
-        // Intentar crear objeto DateTime desde el nombre
-        $fechaArchivo = DateTime::createFromFormat('Y-m-d_H-i-s', $nombreSinExtension);
-
-        if ($fechaArchivo && $fechaArchivo >= $fechaInicio && $fechaArchivo <= $hoy) {
-            $archivosFiltrados[] = $archivo;
-        }
+    } else {
+        $archivos = [];
+        // Opcional: mostrar mensaje de que no hay archivos
     }
 
     // Leer datos de cada archivo con PhpSpreadsheet
@@ -90,7 +96,12 @@ try {
     }
     // Obtener solo los nombres únicos
     $clientesUnicos = array_keys($clientesUnicos);
-    $facturaPromedio = $totalMonto / $totalFacturas;
+    // Antes de dividir por $totalFacturas, comprueba que no sea 0
+    if ($totalFacturas > 0) {
+        $facturaPromedio = $totalMonto / $totalFacturas;
+    } else {
+        $facturaPromedio = 0;
+    }
 } catch (Exception $e) {
     echo "Error al procesar el archivo Excel: " . $e->getMessage() . "\n";
     // Valores por defecto en caso de error

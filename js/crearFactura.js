@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form'); // Ajusta el selector si tu formulario tiene un id/clase
+        const form = document.querySelector('form.form-container'); // Ajusta el selector si tu formulario tiene un id/clase
         const loading = document.querySelector('.loading-overlay');
         if (form && loading) {
             loading.style.display = 'none';

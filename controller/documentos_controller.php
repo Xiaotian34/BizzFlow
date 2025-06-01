@@ -22,6 +22,8 @@ function gestionarDocumentos()
     $documento = new Documentos_Model();
     require_once("model/usuarios_model.php");
     $usuarioModel = new Usuarios_Model();
+    require_once("model/facturas_model.php");
+    $facturaModel = new Facturas_Model();
 
     $message = "";
 
@@ -102,9 +104,11 @@ function gestionarDocumentos()
         }
     }
 
-    // Obtener todos los documentos
-    $id_usuario = $usuarioModel->obtenerIdUsuarioPorCorreo($_SESSION["correo"]); // Función auxiliar
+    // Obtener todos los documentos y facturas del usuario
+    $id_usuario = $usuarioModel->obtenerIdUsuarioPorCorreo($_SESSION["correo"]);
     $array_documentos = $documento->get_documentos_por_usuario($id_usuario);
+    $array_facturas = $facturaModel->get_facturas_por_usuario($id_usuario);
+
     require_once("view/gestionar_view.php");
 }
 
@@ -137,36 +141,20 @@ function convertirExcelXml() {
             $correoUsuario = preg_replace('/[^A-Za-z0-9_\-@.]/', '_', $correoUsuario);
             $fechaActual = date("Y-m-d_H-i-s");
 
-<<<<<<< HEAD
             // Rutas organizadas: documentos/[usuario]/excel/ y documentos/[usuario]/xml/
             $carpetaExcel = __DIR__ . "/../documentos/" . $correoUsuario . "/excel/";
             $carpetaXml   = __DIR__ . "/../documentos/" . $correoUsuario . "/xml/";
 
             if (!is_dir($carpetaExcel)) {
                 mkdir($carpetaExcel, 0777, true);
-=======
-            $carpetaDestinoxlsx = __DIR__ . "/../documentos/" . $correoUsuario . "/excel/ ";
-            $carpetaDestinoxml = __DIR__ . "/../documentos/" . $correoUsuario . "/xml/ ";
-
-            if (!is_dir($carpetaDestinoxlsx)) {
-                mkdir($carpetaDestinoxlsx, 0777, true);
-            }
-            if (!is_dir($carpetaDestinoxml)) {
-                mkdir($carpetaDestinoxml, 0777, true);
->>>>>>> eb0bd94d3184cef822e2392718bc86367c26337c
             }
             if (!is_dir($carpetaXml)) {
                 mkdir($carpetaXml, 0777, true);
             }
 
             $nombreBase = $fechaActual;
-<<<<<<< HEAD
             $outputExcelFile = $carpetaExcel . $nombreBase . ".xlsx";
             $outputXMLFile   = $carpetaXml   . $nombreBase . ".xml";
-=======
-            $outputExcelFile = $carpetaDestinoxlsx . $nombreBase . ".xlsx";
-            $outputXMLFile = $carpetaDestinoxml . $nombreBase . ".xml";
->>>>>>> eb0bd94d3184cef822e2392718bc86367c26337c
 
             // Recoge los datos del formulario - EMISOR
             $emisor_nif = $_POST['emisor_nif'] ?? '';

@@ -1,4 +1,4 @@
-<div class="loading-overlay">
+<div class="loading-overlay" style="display: none;">
     <div class="loading-spinner"></div>
     <div class="loading-message">Procesando conversión, por favor espera...</div>
 </div>
@@ -8,7 +8,7 @@
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(255,255,255,0.85);
     z-index: 9999;
-    display: flex;
+    display: none; /* <-- Añade esto */
     flex-direction: column;
     align-items: center;
     justify-content: center;
